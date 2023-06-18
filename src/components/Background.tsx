@@ -5,8 +5,12 @@ import styled from "styled-components";
 
 const ImageDiv = styled.div`
   z-index: -1;
-  position: fixed;
-  width: 100vw;
+  //   position: fixed;
+  //   width: 100vw;
+  height: 100vh;
+  //   overflow: hidden;
+  position: absolute;
+  width: 100%;
   height: 100vh;
 `;
 

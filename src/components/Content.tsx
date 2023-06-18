@@ -45,14 +45,12 @@ const StyledDetailsDiv = styled(Link)`
 const Content: React.FC = () => {
   return (
     <Bg>
-      {/* <Center> */}
       <div>
-        <Title>Create your own customizable virtual assistant with AI</Title>
+        <Title>Create your own personalized virtual assistant with AI</Title>
         <StyledDetailsDiv href={"/login"}>
           <Details>Get started</Details>
         </StyledDetailsDiv>
       </div>
-      {/* </Center> */}
     </Bg>
   );
 };
