@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React from "react";
 import Link from "next/link";
 import Image from "next/legacy/image";
@@ -33,6 +34,17 @@ const Content = styled.h4`
   font-weight: 400;
 `;
 
+const DetailsWrapper = styled.div``;
+
+const EmailContent = styled.h3`
+  font-size: 1.3125rem;
+  line-height: 130%;
+  letter-spacing: 0.01em;
+  font-weight: 400;
+  width: 100%;
+  position: relative;
+`;
+
 const ImageWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -44,38 +56,38 @@ const ImageContainer = styled.div`
   max-width: 100%;
 `;
 
-const About = (props: Props) => {
+const Careers = (props: Props) => {
   return (
     <MainWrapper>
       <Wrapper>
-        <Title>About</Title>
+        <Title>Careers</Title>
 
         <ContentWrapper>
           <Content>
-            Qubemind is an independent research hub focused on unlocking new
-            dimensions of creativity with AI deployment
+            We believe that developing safe and beneficial AI systems requires a
+            diverse range of perspectives and expertise. We're always on the
+            lookout for curious minds to join our team. Together, we'll explore
+            the endless possibilities of AI and make a positive impact on
+            society.
           </Content>
-
-          <Content>
-            We are a compact, self-funded team with a strong emphasis on design,
-            human infrastructure, and the advancement of cutting-edge
-            technologies.
-          </Content>
+          <DetailsWrapper>
+            <EmailContent>Email us at: careers@qubemind.com</EmailContent>
+          </DetailsWrapper>
         </ContentWrapper>
       </Wrapper>
       <ImageWrapper>
         <ImageContainer>
           <Image
             alt="elven lab"
-            src="/assets/lab5.PNG"
+            src="/assets/girls.PNG"
             layout="responsive"
             objectFit="fill"
             width="100%"
-            height={45}
+            height={50}
           />
         </ImageContainer>
       </ImageWrapper>
     </MainWrapper>
   );
 };
-export default About;
+export default Careers;
