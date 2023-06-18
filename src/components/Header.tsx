@@ -5,7 +5,7 @@ import styled from "styled-components";
 import Center from "./Center";
 
 const StyledHeader = styled.header`
-  background-color: #000;
+  //   background-color: #000;
 `;
 
 const Logo = styled.span`
