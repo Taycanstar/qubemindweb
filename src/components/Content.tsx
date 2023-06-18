@@ -6,12 +6,12 @@ import Center from "./Center";
 
 const Bg = styled.div`
   color: #fff;
-  padding: 50px 0;
+  padding: 50px 30px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  height: 100vh;
+  height: 80vh;
 `;
 
 const Title = styled.h1`
@@ -19,7 +19,7 @@ const Title = styled.h1`
   font-weight: normal;
   margin: 0;
   margin-bottom: 50px;
-  font-size: 3.5rem;
+  font-size: 3.8rem;
   line-height: 110%;
   letter-spacing: -0.01em;
 `;
@@ -32,7 +32,7 @@ const Details = styled.p`
 `;
 
 const StyledDetailsDiv = styled(Link)`
-  margin: 0 auto;
+  //   margin: 20px auto;
   border-width: 1px;
   border-color: #fff;
   border-style: solid;
@@ -42,29 +42,17 @@ const StyledDetailsDiv = styled(Link)`
   max-width: fit-content;
 `;
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr;
-  gap: 40px;
-  img {
-    max-width: 100%;
-  }
-`;
-
-const ImageDiv = styled.div`
-  margin-top: 50px;
-`;
 const Content: React.FC = () => {
   return (
     <Bg>
-      <Center>
-        <div>
-          <Title>Create your own customizable virtual assistant with AI</Title>
-          <StyledDetailsDiv href={"/login"}>
-            <Details>Get started</Details>
-          </StyledDetailsDiv>
-        </div>
-      </Center>
+      {/* <Center> */}
+      <div>
+        <Title>Create your own customizable virtual assistant with AI</Title>
+        <StyledDetailsDiv href={"/login"}>
+          <Details>Get started</Details>
+        </StyledDetailsDiv>
+      </div>
+      {/* </Center> */}
     </Bg>
   );
 };
