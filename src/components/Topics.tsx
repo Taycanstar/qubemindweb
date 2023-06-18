@@ -10,34 +10,65 @@ const StyledDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 30px 50px 30px;
+  padding: 30px 30px 60px 30px;
   background-color: #000;
   color: #fff;
 `;
 
-const Section = styled.div``;
+const Section = styled.div`
+  margin-right: 25px;
+`;
 
-const Title = styled.h2``;
+const Title = styled.h2`
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 130%;
+  //   line-height: 1.2; /* Adjust the line-height as needed */
+  margin-bottom: 0px;
+`;
 
-const Details = styled.p``;
+const DetailsWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
+const Details = styled.p`
+  font-size: 1.05rem;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 16px; /* Adjust the position as needed */
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #fff;
+  }
+`;
 
 const Topics = (props: Props) => {
   return (
     <StyledDiv>
       <Section>
         <Title>Minimize complexity while maximizing your brand's impact</Title>
-        <Details>View plans</Details>
+        <DetailsWrapper>
+          <Details>Explore our plans</Details>
+        </DetailsWrapper>
       </Section>
       <Section>
         <Title>
           Streamlining work and fueling creativity through AI's seamless
           integration
         </Title>
-        <Details>View products</Details>
+        <DetailsWrapper>
+          <Details>Discover our products</Details>
+        </DetailsWrapper>
       </Section>
       <Section>
         <Title>Embark on ajourney to shape the world of tomorrow</Title>
-        <Details>View careers</Details>
+        <DetailsWrapper>
+          <Details>View careers</Details>
+        </DetailsWrapper>
       </Section>
     </StyledDiv>
   );

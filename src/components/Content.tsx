@@ -11,14 +11,14 @@ const Bg = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  height: 80vh;
+  height: 74vh;
 `;
 
 const Title = styled.h1`
   color: #fff;
   font-weight: normal;
   margin: 0;
-  margin-bottom: 50px;
+  padding-bottom: 50px;
   font-size: 3.8rem;
   line-height: 110%;
   letter-spacing: -0.01em;
@@ -32,7 +32,6 @@ const Details = styled.p`
 `;
 
 const StyledDetailsDiv = styled(Link)`
-  //   margin: 20px auto;
   border-width: 1px;
   border-color: #fff;
   border-style: solid;
