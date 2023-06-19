@@ -27,7 +27,7 @@ const ContentWrapper = styled.div`
   flex-direction: column;
 `;
 const Content = styled.h4`
-  font-size: 1.3125rem;
+  font-size: 1.7rem;
   line-height: 130%;
   letter-spacing: 0.01em;
   font-weight: 400;

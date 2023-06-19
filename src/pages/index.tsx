@@ -4,6 +4,8 @@ import Background from "../components/Background";
 import Content from "../components/Content";
 import About from "../components/About";
 import Careers from "../components/Careers";
+import Contact from "../components/Contact";
+import Footer from "../components/Footer";
 import Topics from "../components/Topics";
 import type { NextPage } from "next";
 import Image from "next/legacy/image";
@@ -18,6 +20,8 @@ const HomePage: NextPage = () => {
       <Topics />
       <About />
       <Careers />
+      <Contact />
+      <Footer />
     </div>
   );
 };
