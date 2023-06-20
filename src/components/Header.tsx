@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
 import Link from "next/link";
 import Image from "next/legacy/image";
@@ -6,9 +6,20 @@ import styled from "styled-components";
 import Center from "./Center";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMoreSharp";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 const StyledHeader = styled.header`
-  //   background-color: #000;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: 0.3s;
+
+  ${({ color }) =>
+    color
+      ? `
+    background-color: #000;
+  `
+      : `background-color: rgba(0,0,0,0)`}
 `;
 
 const Logo = styled.span`
@@ -25,7 +36,7 @@ const LogoContainer = styled.div`
 `;
 
 const Wrapper = styled.div`
-  padding: 10px 25px;
+  padding: 0px 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -148,6 +159,17 @@ const Header = (props: Props) => {
   const [isCompanyToggled, setCompanyToggle] = useState(false);
   const [isProductToggled, setProductToggle] = useState(false);
   const [isDevsToggled, setDevsToggle] = useState(false);
+  const [color, setColor] = useState(false);
+
+  const changeColor = (): Boolean => {
+    if (window.scrollY > 50) {
+      setColor(true);
+    } else {
+      setColor(false);
+    }
+  };
+
+  window.addEventListener("scroll", changeColor);
 
   const DropContent = () => {
     return (
@@ -214,7 +236,7 @@ const Header = (props: Props) => {
   });
 
   return (
-    <StyledHeader>
+    <StyledHeader color={color}>
       <Wrapper>
         <Link href={"/"}>
           <LogoContainer>
