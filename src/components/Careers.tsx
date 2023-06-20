@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import styled from "styled-components";
 import Center from "./Center";
+import Reveal from "./Reveal";
 
 const Wrapper = styled.div`
   display: grid;
@@ -76,21 +77,24 @@ const Careers = forwardRef<HTMLDivElement, Props>((props, ref) => {
   return (
     <MainWrapper id="careers">
       <Wrapper>
-        <Title>Careers</Title>
-
-        <ContentWrapper>
-          <Content>
-            We believe that developing safe and beneficial AI systems requires a
-            diverse range of perspectives and expertise. We're always on the
-            lookout for curious minds to join our team. Together, we'll explore
-            the endless possibilities of AI and make a positive impact on
-            society.
-          </Content>
-          <DetailsWrapper>
-            <EmailContent>Email us at:</EmailContent>
-            <EmailContent>careers@qubemind.com</EmailContent>
-          </DetailsWrapper>
-        </ContentWrapper>
+        <Reveal>
+          <Title>Careers</Title>
+        </Reveal>
+        <Reveal>
+          <ContentWrapper>
+            <Content>
+              We believe that developing safe and beneficial AI systems requires
+              a diverse range of perspectives and expertise. We're always on the
+              lookout for curious minds to join our team. Together, we'll
+              explore the endless possibilities of AI and make a positive impact
+              on society.
+            </Content>
+            <DetailsWrapper>
+              <EmailContent>Email us at:</EmailContent>
+              <EmailContent>careers@qubemind.com</EmailContent>
+            </DetailsWrapper>
+          </ContentWrapper>
+        </Reveal>
       </Wrapper>
       <ImageWrapper>
         <ImageContainer>

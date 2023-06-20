@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import styled from "styled-components";
 import Center from "./Center";
+import Reveal from "./Reveal";
 
 const Wrapper = styled.div`
   display: grid;
@@ -77,24 +78,27 @@ const Contact = (props: Props) => {
   return (
     <MainWrapper id="contact">
       <Wrapper>
-        <Title>Contact</Title>
-
-        <ContentWrapper>
-          <InfoWrapper>
-            <EmailContent>
-              For product support or questions please email us at
-              support@qubemind.com
-            </EmailContent>
-          </InfoWrapper>
-          <DetailsWrapper>
-            <Content>For billing support:</Content>
-            <Content>billing@qubemind.com</Content>
-          </DetailsWrapper>
-          <DetailsWrapper>
-            <Content>For journalist inquiries:</Content>
-            <Content>press@qubemind.com</Content>
-          </DetailsWrapper>
-        </ContentWrapper>
+        <Reveal>
+          <Title>Contact</Title>
+        </Reveal>
+        <Reveal>
+          <ContentWrapper>
+            <InfoWrapper>
+              <EmailContent>
+                For product support or questions please email us at
+                support@qubemind.com
+              </EmailContent>
+            </InfoWrapper>
+            <DetailsWrapper>
+              <Content>For billing support:</Content>
+              <Content>billing@qubemind.com</Content>
+            </DetailsWrapper>
+            <DetailsWrapper>
+              <Content>For journalist inquiries:</Content>
+              <Content>press@qubemind.com</Content>
+            </DetailsWrapper>
+          </ContentWrapper>
+        </Reveal>
       </Wrapper>
       <UnderlineWrapper>
         <Underline />

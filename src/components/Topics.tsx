@@ -3,6 +3,7 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/legacy/image";
 import styled from "styled-components";
+import Reveal from "./Reveal";
 
 type Props = {};
 
@@ -61,29 +62,35 @@ const Topics = (props: Props) => {
   return (
     <Wrapper>
       <StyledDiv>
-        <Section>
-          <Title>
-            Minimize complexity while maximizing your brand's impact
-          </Title>
-          <DetailsWrapper>
-            <Details>Explore our plans</Details>
-          </DetailsWrapper>
-        </Section>
-        <Section>
-          <Title>
-            Streamlining work and fueling creativity through AI's seamless
-            integration
-          </Title>
-          <DetailsWrapper>
-            <Details>Discover our products</Details>
-          </DetailsWrapper>
-        </Section>
-        <Section>
-          <Title>Embark on ajourney to shape the world of tomorrow</Title>
-          <DetailsWrapper>
-            <Details>View careers</Details>
-          </DetailsWrapper>
-        </Section>
+        <Reveal>
+          <Section>
+            <Title>
+              Minimize complexity while maximizing your brand's impact
+            </Title>
+            <DetailsWrapper>
+              <Details>Explore our plans</Details>
+            </DetailsWrapper>
+          </Section>
+        </Reveal>
+        <Reveal>
+          <Section>
+            <Title>
+              Streamlining work and fueling creativity through AI's seamless
+              integration
+            </Title>
+            <DetailsWrapper>
+              <Details>Discover our products</Details>
+            </DetailsWrapper>
+          </Section>
+        </Reveal>
+        <Reveal>
+          <Section>
+            <Title>Embark on ajourney to shape the world of tomorrow</Title>
+            <DetailsWrapper>
+              <Details>View careers</Details>
+            </DetailsWrapper>
+          </Section>
+        </Reveal>
       </StyledDiv>
       <UnderlineWrapper>
         <Underline />

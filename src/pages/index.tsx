@@ -12,25 +12,14 @@ import Image from "next/legacy/image";
 import styled from "styled-components";
 
 const HomePage: NextPage = () => {
-  const careersRef = useRef<HTMLDivElement | null>(null);
-
-  const handleScrollToCareers = () => {
-    if (careersRef.current) {
-      careersRef.current.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
-
   return (
     <div>
       <Background />
-      <Header onCareersClick={handleScrollToCareers} />
+      <Header />
       <Content />
       <Topics />
       <About />
-      <Careers forwardRef={careersRef} />
+      <Careers />
       <Contact />
       <Footer />
     </div>

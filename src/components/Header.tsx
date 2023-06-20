@@ -7,6 +7,7 @@ import Center from "./Center";
 import ExpandMoreSharpIcon from "@mui/icons-material/ExpandMoreSharp";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import { motion, useScroll, useTransform } from "framer-motion";
+import Reveal from "./Reveal";
 
 const StyledHeader = styled.header`
   position: sticky;
@@ -151,7 +152,6 @@ const ProductWrapper = styled.div``;
 const DevsWrapper = styled.div``;
 
 type Props = {
-  onCareersClick: () => void;
   // ... other props
 };
 
@@ -161,15 +161,24 @@ const Header = (props: Props) => {
   const [isDevsToggled, setDevsToggle] = useState(false);
   const [color, setColor] = useState(false);
 
-  const changeColor = (): Boolean => {
-    if (window.scrollY > 50) {
+  const changeColor = (): boolean => {
+    if (typeof window !== "undefined" && window.scrollY > 50) {
       setColor(true);
     } else {
       setColor(false);
     }
   };
 
-  window.addEventListener("scroll", changeColor);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("scroll", changeColor);
+
+      // Cleanup function
+      return () => {
+        window.removeEventListener("scroll", changeColor);
+      };
+    }
+  }, []);
 
   const DropContent = () => {
     return (
@@ -249,6 +258,7 @@ const Header = (props: Props) => {
             <Logo>Qubemind</Logo>
           </LogoContainer>
         </Link>
+
         <StyledNav>
           <DevsWrapper>
             <NavChevronItem onClick={() => setDevsToggle(!isDevsToggled)}>

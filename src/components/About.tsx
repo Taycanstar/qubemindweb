@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/legacy/image";
 import styled from "styled-components";
 import Center from "./Center";
+import Reveal from "./Reveal";
 
 const Wrapper = styled.div`
   display: grid;
@@ -47,21 +48,25 @@ const About = (props: Props) => {
   return (
     <MainWrapper id="about">
       <Wrapper>
-        <Title>About</Title>
+        <Reveal>
+          <Title>About</Title>
+        </Reveal>
+        <Reveal>
+          <ContentWrapper>
+            <Content>
+              Qubemind is an independent research hub focused on unlocking new
+              dimensions of creativity with AI deployment
+            </Content>
 
-        <ContentWrapper>
-          <Content>
-            Qubemind is an independent research hub focused on unlocking new
-            dimensions of creativity with AI deployment
-          </Content>
-
-          <Content>
-            We are a compact, self-funded team with a strong emphasis on design,
-            human infrastructure, and the advancement of cutting-edge
-            technologies.
-          </Content>
-        </ContentWrapper>
+            <Content>
+              We are a compact, self-funded team with a strong emphasis on
+              design, human infrastructure, and the advancement of cutting-edge
+              technologies.
+            </Content>
+          </ContentWrapper>
+        </Reveal>
       </Wrapper>
+
       <ImageWrapper>
         <ImageContainer>
           <Image
