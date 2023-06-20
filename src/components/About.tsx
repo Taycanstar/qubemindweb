@@ -36,7 +36,6 @@ const Content = styled.h4`
 const ImageWrapper = styled.div`
   width: 100%;
   display: flex;
-  background-color: red;
 `;
 
 const ImageContainer = styled.div`
@@ -46,7 +45,7 @@ const ImageContainer = styled.div`
 
 const About = (props: Props) => {
   return (
-    <MainWrapper>
+    <MainWrapper id="about">
       <Wrapper>
         <Title>About</Title>
 
@@ -67,7 +66,7 @@ const About = (props: Props) => {
         <ImageContainer>
           <Image
             alt="elven lab"
-            src="/assets/lab5.PNG"
+            src="/assets/office.PNG"
             layout="responsive"
             objectFit="fill"
             width="100%"

@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import React from "react";
+import React, { forwardRef } from "react";
 import Link from "next/link";
 import Image from "next/legacy/image";
 import styled from "styled-components";
@@ -49,17 +49,32 @@ const EmailContent = styled.h3`
 const ImageWrapper = styled.div`
   width: 100%;
   display: flex;
-  background-color: red;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
 `;
 
 const ImageContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  max-width: 100%;
+  // padding: 0 30px;
 `;
 
-const Careers = (props: Props) => {
+const ImageRow = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+`;
+
+type Props = {
+  // ... other Props
+  forwardRef?: React.RefObject<HTMLDivElement>;
+};
+
+const Careers = forwardRef<HTMLDivElement, Props>((props, ref) => {
   return (
-    <MainWrapper>
+    <MainWrapper id="careers">
       <Wrapper>
         <Title>Careers</Title>
 
@@ -79,17 +94,45 @@ const Careers = (props: Props) => {
       </Wrapper>
       <ImageWrapper>
         <ImageContainer>
-          <Image
-            alt="elven lab"
-            src="/assets/girl.PNG"
-            layout="responsive"
-            objectFit="fill"
-            width="100%"
-            height={50}
-          />
+          <ImageRow>
+            <Image
+              alt="elven lab"
+              src="/assets/player2.PNG"
+              // layout="responsive"
+              objectFit="contain"
+              width={330}
+              height={330}
+            />
+            <Image
+              alt="elven lab"
+              src="/assets/player3.PNG"
+              // layout="responsive"
+              objectFit="contain"
+              width={330}
+              height={330}
+            />
+            <Image
+              alt="elven lab"
+              src="/assets/player6.PNG"
+              // layout="responsive"
+              objectFit="contain"
+              width={330}
+              height={330}
+            />
+            <Image
+              alt="elven lab"
+              src="/assets/player4.PNG"
+              // layout="responsive"
+              objectFit="contain"
+              width={330}
+              height={330}
+            />
+          </ImageRow>
         </ImageContainer>
       </ImageWrapper>
     </MainWrapper>
   );
-};
+});
+
+Careers.displayName = "Careers";
 export default Careers;

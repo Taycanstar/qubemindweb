@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Header from "../components/Header";
 import Background from "../components/Background";
 import Content from "../components/Content";
@@ -12,14 +12,25 @@ import Image from "next/legacy/image";
 import styled from "styled-components";
 
 const HomePage: NextPage = () => {
+  const careersRef = useRef<HTMLDivElement | null>(null);
+
+  const handleScrollToCareers = () => {
+    if (careersRef.current) {
+      careersRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  };
+
   return (
     <div>
       <Background />
-      <Header />
+      <Header onCareersClick={handleScrollToCareers} />
       <Content />
       <Topics />
       <About />
-      <Careers />
+      <Careers forwardRef={careersRef} />
       <Contact />
       <Footer />
     </div>

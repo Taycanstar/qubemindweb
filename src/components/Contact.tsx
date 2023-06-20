@@ -75,7 +75,7 @@ const UnderlineWrapper = styled.div`
 
 const Contact = (props: Props) => {
   return (
-    <MainWrapper>
+    <MainWrapper id="contact">
       <Wrapper>
         <Title>Contact</Title>
 
