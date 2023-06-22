@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import Header from "../components/Header";
 import Background from "../components/Background";
 import Content from "../components/Content";
@@ -10,6 +10,7 @@ import Topics from "../components/Topics";
 import type { NextPage } from "next";
 import Image from "next/legacy/image";
 import styled from "styled-components";
+import { ScrollLockProvider } from "../components/ScrollLockContext";
 
 const HomePage: NextPage = () => {
   return (

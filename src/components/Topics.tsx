@@ -10,16 +10,31 @@ type Props = {};
 const Wrapper = styled.div``;
 
 const StyledDiv = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   justify-content: space-between;
   align-items: center;
   padding: 40px 30px 70px 30px;
   background-color: #000;
   color: #fff;
+  flex-wrap: no-wrap;
+
+  @media (max-width: 744px) {
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 745px) and (max-width: 1200px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (min-width: 1201px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 `;
 
 const Section = styled.div`
   margin-right: 25px;
+  margin-bottom: 25px;
 `;
 
 const Title = styled.h2`
@@ -27,6 +42,18 @@ const Title = styled.h2`
   font-weight: 600;
   line-height: 130%;
   margin-bottom: 0px;
+
+  @media (min-width: 1200px) {
+    font-size: 1.7rem;
+  }
+
+  @media (max-width: 744px) {
+    font-size: 1.3rem;
+  }
+
+  @media (min-width: 745px) and (max-width: 1200px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const DetailsWrapper = styled.div`
@@ -40,7 +67,7 @@ const Details = styled.p`
   &::after {
     content: "";
     position: absolute;
-    bottom: 16px; /* Adjust the position as needed */
+    bottom: 16px;
     left: 0;
     width: 100%;
     height: 1px;

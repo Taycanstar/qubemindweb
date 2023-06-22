@@ -14,6 +14,10 @@ const Wrapper = styled.div`
   padding: 100px 30px;
   background-color: #000;
   color: #fff;
+
+  @media (max-width: 744px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const MainWrapper = styled.div``;
@@ -22,6 +26,14 @@ const Title = styled.h2`
   font-size: 2.8rem;
   font-weight: 500;
   letter-spacing: 0.015em;
+
+  @media (max-width: 744px) {
+    font-size: 2.1rem;
+  }
+
+  @media (min-width: 745px) and (max-width: 1200px) {
+    font-size: 2.5rem;
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -33,6 +45,14 @@ const Content = styled.h4`
   line-height: 130%;
   letter-spacing: 0.01em;
   font-weight: 400;
+
+  @media (max-width: 744px) {
+    font-size: 1.3rem;
+  }
+
+  @media (min-width: 745px) and (max-width: 1200px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const DetailsWrapper = styled.div``;

@@ -19,10 +19,14 @@ const Title = styled.h1`
   color: #fff;
   font-weight: normal;
   margin: 0;
-  padding-bottom: 0px;
+  padding-bottom: 50px;
   font-size: 3.8rem;
   line-height: 110%;
   letter-spacing: -0.01em;
+
+  @media (max-width: 743px) {
+    font-size: 2.6rem;
+  }
 `;
 
 const Subtitle = styled.h1`
@@ -167,7 +171,7 @@ const Content: React.FC = () => {
           <Title>
             Create your own personalized virtual <TypewriterEffect />
           </Title>
-          <Subtitle> with AI </Subtitle>
+          {/* <Subtitle></Subtitle> */}
           <StyledDetailsDiv href={"/login"}>
             <Details>Get started</Details>
           </StyledDetailsDiv>
