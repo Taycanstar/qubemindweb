@@ -8,6 +8,8 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Inter', sans-serif;
   }
 
+  * { box-sizing: border-box; }
+
 
   li {
     margin: 0;
@@ -18,7 +20,15 @@ const GlobalStyle = createGlobalStyle`
   a {
   text-decoration: none;
 }
-  /* Add more global styles as needed */
+  .light-theme{
+    --bg: #fff;
+    --font: black;
+  }
+
+  .dark-theme {
+    --bg: rgba(24,25,26,1);
+    --font: white;
+  }
 `;
 
 export default GlobalStyle;

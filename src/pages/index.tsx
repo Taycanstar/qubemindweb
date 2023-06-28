@@ -8,7 +8,6 @@ import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import Topics from "../components/Topics";
 import type { NextPage } from "next";
-import Image from "next/legacy/image";
 import styled from "styled-components";
 import { ScrollLockProvider } from "../components/ScrollLockContext";
 
