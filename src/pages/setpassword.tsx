@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import Image from "next/image";
-import {
-  transparentLogo,
-  googleLogo,
-  appleLogo,
-  microsoftLogo,
-} from "../app/utils/images/ImageAssets";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { transparentLogo } from "../app/utils/images/ImageAssets";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 type Props = {};
 
@@ -77,6 +74,15 @@ const InputBox = styled.div`
   justify-content: center;
 `;
 
+const PassBox = styled.div`
+  position: relative;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  display: flex;
+`;
+
 const EmailInput = styled.input`
   height: 52px;
   box-sizing: border-box;
@@ -111,7 +117,7 @@ const EmailLabel = styled.span`
   ${EmailInput}:valid + &,
   ${EmailInput}:focus + & {
     color: ${Colors.amethyst};
-    transform: translateX(10px) translateY(-7px);
+    transform: translateX(10px) translateY(-25px);
     font-size: 14px;
     padding: 0 10px;
     background: white;
@@ -159,27 +165,6 @@ const SignupBtn = styled.button`
   }
 `;
 
-const SocialBtn = styled.button`
-  margin-bottom: 8px;
-  justify-content: center;
-  align-items: center;
-  display: block;
-  width: 100%;
-  height: 52px;
-  padding: 0 15px;
-  border: 1px solid ${Colors.grayline};
-  border-radius: 3px;
-  background-color: white;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #dcdcdc;
-  }
-`;
-
 const XtraSubtitle = styled(Link)`
   font-size: 14px;
   color: ${Colors.amethyst};
@@ -223,24 +208,6 @@ const Underline = styled.div`
   margin-bottom: 24px;
 `;
 
-const GoogleBox = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const GText = styled.p`
-  font-size: 16px;
-  font-weight: light;
-  color: black;
-`;
-
-const LogoWrapper = styled.div`
-  width: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
 const StyledImage = styled(Image)`
   max-width: 100%;
   max-height: 100%;
@@ -252,12 +219,23 @@ const Footer = styled.footer`
   justify-content: center;
   align-items: center;
   padding-bottom: 20px;
+  margin-top: auto;
+  padding-bottom: 20px;
+  width: 100%;
+`;
+
+const PageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 `;
 
 const FooterWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-content: center;
+  align-items: center;
 `;
 const StyledFooterDiv = styled.div``;
 
@@ -271,114 +249,124 @@ const Separator = styled.div`
   border-left: 1px solid ${Colors.amethyst};
 `;
 
-const SignupPage = (props: Props) => {
-  const [email, setEmail] = useState<string>("");
+const EyeWrapper = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+`;
+
+const EditLabel = styled(Link)`
+  font-size: 16px;
+  color: ${Colors.amethyst};
+`;
+
+const EditWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  transform: translateY(-38px);
+  right: 15px;
+  background-color: red;
+  height: 100%;
+`;
+
+const EditBox = styled.div`
+  position: relative;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  display: flex;
+`;
+
+const SetPasswordPage = (props: Props) => {
   const router = useRouter();
+  const email = router.query.email;
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault(); // Prevent the default form submission behavior.
 
     console.log(`Form submitted with email: ${email}`);
 
-    // Navigate to the new page with email as a query parameter
+    // Navigate to the email verification page
     router.push({
-      pathname: "/setpassword",
+      pathname: "/onboarding",
       query: { email },
     });
   };
 
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   return (
-    <Wrapper>
-      <Image
-        alt="transparent Logo"
-        src={transparentLogo}
-        objectFit="contain"
-        width={100}
-        height={100}
-      />
-      <Section>
-        <Content>
-          <Header>
-            <CreateText>Create your account</CreateText>
-            <Subtitle>
-              Please be aware that we may need to verify your identity via phone
-              during the signup process. Rest assured, your phone number will
-              solely be used for this security measure.
-            </Subtitle>
-          </Header>
-          <EmailDiv>
-            <SignupForm onSubmit={handleSubmit}>
-              <InputBox>
-                <EmailInput
-                  type="email"
-                  required="required"
-                  value={email}
-                  onChange={handleEmailChange}
-                />
-                <EmailLabel>Email address</EmailLabel>
-              </InputBox>
-              <SignupBtn type="submit">Continue</SignupBtn>
-            </SignupForm>
-            <LoginWrapper>
-              <Subtitle>Already have an account?</Subtitle>
-              <XtraSubtitle href="/login">Log in</XtraSubtitle>
-            </LoginWrapper>
-          </EmailDiv>
-          <InputBox>
-            <Underline>
-              <UnderlineText>
-                <OrText>OR</OrText>
-              </UnderlineText>
-            </Underline>
-          </InputBox>
-          <SocialBtn type="button">
-            <GoogleBox>
-              <LogoWrapper>
-                <StyledImage
-                  alt="google Logo"
-                  src={googleLogo}
-                  objectFit="cover"
-                  width={25}
-                  height={25}
-                />
-              </LogoWrapper>
-              <GText>Continue with Google</GText>
-            </GoogleBox>
-          </SocialBtn>
-          <SocialBtn type="button">
-            <GoogleBox>
-              <LogoWrapper>
-                <StyledImage
-                  alt="microsoft Logo"
-                  src={microsoftLogo}
-                  objectFit="contain"
-                  width={20}
-                  height={20}
-                />
-              </LogoWrapper>
-              <GText>Continue with Microsoft</GText>
-            </GoogleBox>
-          </SocialBtn>
-          <SocialBtn type="button">
-            <GoogleBox>
-              <LogoWrapper>
-                <StyledImage
-                  alt="apple Logo"
-                  src={appleLogo}
-                  objectFit="cover"
-                  width={30}
-                  height={30}
-                />
-              </LogoWrapper>
-              <GText>Continue with Apple</GText>
-            </GoogleBox>
-          </SocialBtn>
-        </Content>
-      </Section>
+    <PageContainer>
+      <Wrapper>
+        <Image
+          alt="transparent Logo"
+          src={transparentLogo}
+          objectFit="contain"
+          width={100}
+          height={100}
+        />
+        <Section>
+          <Content>
+            <Header>
+              <CreateText>Create your account</CreateText>
+              <Subtitle>
+                Please be aware that we may need to verify your identity via
+                phone during the signup process. Rest assured, your phone number
+                will solely be used for this security measure.
+              </Subtitle>
+            </Header>
+            <EmailDiv>
+              <SignupForm onSubmit={handleSubmit}>
+                <InputBox>
+                  <EmailInput
+                    type="email"
+                    required="required"
+                    value={email}
+                    disabled={true}
+                  />
+                </InputBox>
+                <EditBox>
+                  <EditWrapper>
+                    <EditLabel href={"/login"}>Edit</EditLabel>
+                  </EditWrapper>
+                </EditBox>
+                <PassBox>
+                  <EmailInput
+                    type={showPassword ? "text" : "password"}
+                    required="required"
+                    value={password}
+                    onChange={handlePasswordChange}
+                  />
+                  <EmailLabel>Password</EmailLabel>
+                  {showPassword === true ? (
+                    <EyeWrapper onClick={togglePasswordVisibility}>
+                      <VisibilityOffIcon style={{ color: Colors.grayline }} />
+                    </EyeWrapper>
+                  ) : (
+                    <EyeWrapper onClick={togglePasswordVisibility}>
+                      <VisibilityIcon style={{ color: Colors.grayline }} />
+                    </EyeWrapper>
+                  )}
+                </PassBox>
+                <SignupBtn type="submit">Continue</SignupBtn>
+              </SignupForm>
+              <LoginWrapper>
+                <Subtitle>Already have an account?</Subtitle>
+                <XtraSubtitle href="/login">Log in</XtraSubtitle>
+              </LoginWrapper>
+            </EmailDiv>
+          </Content>
+        </Section>
+      </Wrapper>
       <Footer>
         <FooterWrapper>
           <StyledFooterDiv>
@@ -390,8 +378,8 @@ const SignupPage = (props: Props) => {
           </StyledFooterDiv>
         </FooterWrapper>
       </Footer>
-    </Wrapper>
+    </PageContainer>
   );
 };
 
-export default SignupPage;
+export default SetPasswordPage;
