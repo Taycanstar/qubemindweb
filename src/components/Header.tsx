@@ -20,22 +20,13 @@ import { Navigation } from "./Navigation";
 import { useDimensions } from "./use-dimensions";
 import { useScrollLock } from "./ScrollLockContext";
 
-const StyledHeader = styled.header`
+const StyledHeader = styled(({ bgColor, ...props }) => <header {...props} />)`
   position: sticky;
   top: 0;
   z-index: 100;
   transition: 0.3s;
 
-  background-color: ${({ color }) => (color ? "#000" : "rgba(0, 0, 0, 0)")};
-
-  ${({ isOpen }) =>
-    isOpen &&
-    `
-    body {
-overflow: hidden;
-    }
-
-  `}
+  background-color: ${(props) => (props.bgColor ? "#000" : "rgba(0, 0, 0, 0)")};
 `;
 
 const Logo = styled.span`
@@ -176,6 +167,18 @@ type Props = {
   toggleOpen: () => void;
 };
 
+type HeaderDesktopProps = {
+  isCompanyToggled: boolean;
+  setCompanyToggle: (value: boolean) => void;
+  isProductToggled: boolean;
+  setProductToggle: (value: boolean) => void;
+  isDevsToggled: boolean;
+  setDevsToggle: (value: boolean) => void;
+  menuAppear: any; // change 'any' to the appropriate type
+  productsAppear: any; // change 'any' to the appropriate type
+  devsAppear: any; // change 'any' to the appropriate type
+};
+
 const sidebar = {
   open: (height = 1000) => ({
     clipPath: `circle(${height * 2 + 200}px at calc(100% - 40px) 40px)`,
@@ -212,17 +215,17 @@ const MotionNav = styled(motion.nav)`
   bottom: 0;
   width: 300px;
 
-  body {
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(180deg, #0055ff 0%, rgb(0, 153, 255) 100%);
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+  // body {
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(180deg, #0055ff 0%, rgb(0, 153, 255) 100%);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  // }
 
   ul {
     padding: 25px;
@@ -271,18 +274,17 @@ const MotionNav = styled(motion.nav)`
 
 const MotionWrapper = styled.div`
   z-index: 2;
-  body {
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(180deg, #0055ff 0%, rgb(0, 153, 255) 100%);
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-  }
+  // body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  // }
 
   nav {
     position: fixed;
@@ -472,7 +474,7 @@ const HeaderDesktop = ({
   menuAppear,
   productsAppear,
   devsAppear,
-}) => {
+}: HeaderDesktopProps) => {
   return (
     <Wrapper>
       <Link href={"/"}>
@@ -540,14 +542,14 @@ const HeaderDesktop = ({
 };
 
 const Header = (props: Props) => {
-  const [isCompanyToggled, setCompanyToggle] = useState(false);
-  const [isProductToggled, setProductToggle] = useState(false);
-  const [isDevsToggled, setDevsToggle] = useState(false);
-  const [color, setColor] = useState(false);
+  const [isCompanyToggled, setCompanyToggle] = useState<boolean>(false);
+  const [isProductToggled, setProductToggle] = useState<boolean>(false);
+  const [isDevsToggled, setDevsToggle] = useState<boolean>(false);
+  const [bgColor, setColor] = useState<boolean>(false);
 
   const [isOpen, toggleOpen] = useCycle(false, true);
 
-  const [windowWidth, setWindowWidth] = useState(0);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
 
   useEffect(() => {
     const handleResize = () => {
@@ -614,7 +616,7 @@ const Header = (props: Props) => {
   });
 
   return (
-    <StyledHeader color={color}>
+    <StyledHeader bgColor={bgColor}>
       {isOpen && (
         <motion.div
           className="dimmed-area"

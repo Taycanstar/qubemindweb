@@ -25,9 +25,11 @@ const Content = styled.div`
   justify-content: center;
   flex-direction: column;
   padding-top: 100px;
-
-  // background: red;
   padding: 100px 40px 40px 40px;
+
+  @media (max-width: 744px) {
+    padding: 30px 40px 40px 40px;
+  }
 `;
 
 const CreateText = styled.h1`
@@ -292,7 +294,6 @@ const SignupPage = (props: Props) => {
         objectFit="contain"
         width={100}
         height={100}
-        layout="fixed"
       />
       <Section>
         <Content>
@@ -307,7 +308,12 @@ const SignupPage = (props: Props) => {
           <EmailDiv>
             <SignupForm onSubmit={handleSubmit}>
               <InputBox>
-                <EmailInput type="text" required="required" />
+                <EmailInput
+                  type="email"
+                  required="required"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
                 <EmailLabel>Email address</EmailLabel>
               </InputBox>
               <SignupBtn type="submit">Continue</SignupBtn>

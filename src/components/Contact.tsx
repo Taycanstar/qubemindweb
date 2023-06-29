@@ -101,7 +101,7 @@ const UnderlineWrapper = styled.div`
   background-color: #000;
 `;
 
-const Contact = (props: Props) => {
+const Contact: React.FC = () => {
   return (
     <MainWrapper id="contact">
       <Wrapper>

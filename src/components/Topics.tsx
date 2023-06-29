@@ -112,7 +112,7 @@ const Topics = (props: Props) => {
         </Reveal>
         <Reveal>
           <Section>
-            <Title>Embark on ajourney to shape the world of tomorrow</Title>
+            <Title>Embark on a journey to shape the world of tomorrow</Title>
             <DetailsWrapper>
               <Details>View careers</Details>
             </DetailsWrapper>

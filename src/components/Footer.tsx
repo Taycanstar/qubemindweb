@@ -33,7 +33,7 @@ const Footer = (props: Props) => {
         <TextWrapper>
           <Text href="/">Qubemind © 2023</Text>
           <Text href="/terms">Terms & policies</Text>
-          <Text href="/privacy">Privacy policy</Text>
+          <Text href="/privacy-policy">Privacy policy</Text>
         </TextWrapper>
       </Center>
     </Wrapper>

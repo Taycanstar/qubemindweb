@@ -8,4 +8,5 @@ export default {
   redline: "rgba(244,48,64,1)",
   amethyst: "#9b5de5",
   darkAmethyst: "#8a4dd3",
+  hoverGray: "#dcdcdc",
 };

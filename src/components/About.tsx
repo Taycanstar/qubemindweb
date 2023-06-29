@@ -64,7 +64,7 @@ const ImageContainer = styled.div`
   max-width: 100%;
 `;
 
-const About = (props: Props) => {
+const About: React.FC = () => {
   return (
     <MainWrapper id="about">
       <Wrapper>
