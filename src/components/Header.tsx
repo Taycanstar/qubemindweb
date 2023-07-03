@@ -20,13 +20,22 @@ import { Navigation } from "./Navigation";
 import { useDimensions } from "./use-dimensions";
 import { useScrollLock } from "./ScrollLockContext";
 
-const StyledHeader = styled(({ bgColor, ...props }) => <header {...props} />)`
+// const StyledHeader = styled(({ bgColor, ...props }) => <header {...props} />)`
+//   position: sticky;
+//   top: 0;
+//   z-index: 100;
+//   transition: 0.3s;
+
+//   background-color: ${(props) => (props.bgColor ? "#000" : "rgba(0, 0, 0, 0)")};
+// `;
+const StyledHeader = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
   transition: 0.3s;
 
-  background-color: ${(props) => (props.bgColor ? "#000" : "rgba(0, 0, 0, 0)")};
+  background-color: ${(props) =>
+    props.$bgColor ? "#000" : "rgba(0, 0, 0, 0)"};
 `;
 
 const Logo = styled.span`
@@ -616,7 +625,7 @@ const Header = (props: Props) => {
   });
 
   return (
-    <StyledHeader bgColor={bgColor}>
+    <StyledHeader $bgColor={bgColor}>
       {isOpen && (
         <motion.div
           className="dimmed-area"

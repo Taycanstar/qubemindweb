@@ -10,6 +10,7 @@ import {
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 type Props = {};
 
@@ -296,9 +297,7 @@ const SignupPage = (props: Props) => {
       <Image
         alt="transparent Logo"
         src={transparentLogo}
-        objectFit="contain"
-        width={100}
-        height={100}
+        style={{ objectFit: "contain", width: "100px", height: "100px" }}
       />
       <Section>
         <Content>
@@ -341,9 +340,7 @@ const SignupPage = (props: Props) => {
                 <StyledImage
                   alt="google Logo"
                   src={googleLogo}
-                  objectFit="cover"
-                  width={25}
-                  height={25}
+                  style={{ objectFit: "cover", width: "25px", height: "25px" }}
                 />
               </LogoWrapper>
               <GText>Continue with Google</GText>
@@ -355,9 +352,11 @@ const SignupPage = (props: Props) => {
                 <StyledImage
                   alt="microsoft Logo"
                   src={microsoftLogo}
-                  objectFit="contain"
-                  width={20}
-                  height={20}
+                  style={{
+                    objectFit: "contain",
+                    width: "20px",
+                    height: "20px",
+                  }}
                 />
               </LogoWrapper>
               <GText>Continue with Microsoft</GText>
@@ -369,9 +368,7 @@ const SignupPage = (props: Props) => {
                 <StyledImage
                   alt="apple Logo"
                   src={appleLogo}
-                  objectFit="cover"
-                  width={30}
-                  height={30}
+                  style={{ objectFit: "cover", width: "30px", height: "30px" }}
                 />
               </LogoWrapper>
               <GText>Continue with Apple</GText>

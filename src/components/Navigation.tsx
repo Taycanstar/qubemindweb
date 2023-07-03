@@ -70,7 +70,7 @@ let login: Item = {
 
 let signup: Item = {
   text: "Sign up",
-  url: "/login",
+  url: "/signup",
 };
 
 const values: Item[] = [devs, product, company, login, signup];

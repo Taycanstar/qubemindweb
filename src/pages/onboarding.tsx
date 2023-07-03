@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { transparentLogo } from "../app/utils/images/ImageAssets";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
 
 type Props = {};
 
@@ -211,6 +212,36 @@ const LoginWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(138, 77, 211, 0.2);
+    cursor: pointer;
+  }
+`;
+
+const BlockWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+`;
+
+const SubtitleZ = styled.p`
+  text-align: center;
+  font-size: 14px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: black;
 `;
 
 const Underline = styled.div`
@@ -293,37 +324,82 @@ const EditBox = styled.div`
   display: flex;
 `;
 
+const local = process.env.REACT_APP_LOCAL_URL;
+
 const OnboardingPage = (props: Props) => {
   const router = useRouter();
-  const email = router.query.email;
-  const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { token, email, hashedPassword } = router.query;
+  const [userExists, setUserExists] = useState<boolean>(false);
+  const [isResendActive, setIsResendActive] = useState<boolean>(true);
+  const [isError, setIsError] = useState<boolean>(false);
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission behavior.
+  useEffect(() => {
+    const checkUserExists = async () => {
+      try {
+        const response = await axios.get(
+          `${local}/u/check-user-exists?email=${email}`
+        );
+        setUserExists(response.data.exists);
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      }
+    };
 
-    console.log(`Form submitted with email: ${email}`);
+    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
 
-    // Navigate to the email verification page
-    router.push("/onboarding");
+    return () => clearInterval(intervalId); // Clean up on component unmount
+  }, [email]);
+
+  useEffect(() => {
+    if (userExists) {
+      // Navigate to the next page
+      //   router.push("/");
+    }
+  }, [userExists, router]);
+
+  const onResend = async () => {
+    try {
+      const response = await axios.post(`${local}/u/resend-confirmation`, {
+        email,
+      });
+      console.log(response.data.message);
+
+      setIsResendActive(false);
+      setTimeout(() => {
+        setIsResendActive(true);
+      }, 15000);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
+  useEffect(() => {
+    const confirmUser = async () => {
+      if (token && email && hashedPassword) {
+        try {
+          const response = await axios.post(`${local}/u/confirm-user`, {
+            confirmationToken: token,
+            email,
+            hashedPassword,
+          });
+          console.log(response.data);
+          // TODO: Handle successful confirmation. Maybe redirect to a success page?
+        } catch (error) {
+          console.error(`Error: ${error}`);
+          // TODO: Handle error. Maybe show an error message to the user?
+        }
+      }
+    };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+    confirmUser();
+  }, [token, email, hashedPassword]);
   return (
     <PageContainer>
       <Wrapper>
         <Image
           alt="transparent Logo"
           src={transparentLogo}
-          objectFit="contain"
-          width={100}
-          height={100}
+          style={{ objectFit: "contain", width: "100px", height: "100px" }}
         />
         <Section>
           <Content>
@@ -334,10 +410,15 @@ const OnboardingPage = (props: Props) => {
                 email to begin the process.
               </Subtitle>
             </Header>
-
-            <LoginWrapper>
-              <SubtitleY>Resend email</SubtitleY>
-            </LoginWrapper>
+            {isResendActive ? (
+              <LoginWrapper onClick={onResend}>
+                <SubtitleY>Resend email</SubtitleY>
+              </LoginWrapper>
+            ) : (
+              <BlockWrapper onClick={onResend}>
+                <SubtitleZ>Email sent.</SubtitleZ>
+              </BlockWrapper>
+            )}
           </Content>
         </Section>
       </Wrapper>

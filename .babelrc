@@ -12,6 +12,7 @@
           "@constants": "./src/constants"
         }
       }
-    ]
+    ],
+    ["babel-plugin-styled-components"]
   ]
 }

@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+/* eslint-disable react/no-unescaped-entities */
+// confirmEmail.tsx
+import axios from "axios";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { transparentLogo } from "../app/utils/images/ImageAssets";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import axios from "axios";
-import ErrorIcon from "@mui/icons-material/Error";
-
-type Props = {};
 
 const Wrapper = styled.div`
   display: flex;
@@ -41,9 +38,23 @@ const CreateText = styled.h1`
   margin: 15px 0;
 `;
 
-const Subtitle = styled.p`
+const SubtitleY = styled.p`
   text-align: center;
   font-size: 14px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: ${Colors.amethyst};
+`;
+
+const Subtitle = styled.p`
+  text-align: center;
+  font-size: 16px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -76,16 +87,15 @@ const InputBox = styled.div`
   justify-content: center;
 `;
 
-const PassBox = styled.div`
+const BdBox = styled.div`
   position: relative;
   width: 100%;
   align-items: center;
   justify-content: center;
   margin-top: 12px;
-  display: flex;
 `;
 
-const EmailInput = styled.input`
+const BirthdayInput = styled.input`
   height: 52px;
   box-sizing: border-box;
   width: 100%;
@@ -106,7 +116,7 @@ const EmailInput = styled.input`
   }
 `;
 
-const EmailLabel = styled.span`
+const BirthdayLabel = styled.span`
   position: absolute;
   left: 0;
   padding: 15px;
@@ -116,8 +126,49 @@ const EmailLabel = styled.span`
   transition: 0.5s;
   pointer-events: none;
 
-  ${EmailInput}:valid + &,
-  ${EmailInput}:focus + & {
+  ${BirthdayInput}:valid + &,
+  ${BirthdayInput}:focus + & {
+    color: ${Colors.amethyst};
+    transform: translateX(10px) translateY(-25px);
+    font-size: 14px;
+    padding: 0 10px;
+    background: white;
+  }
+`;
+
+const OrgInput = styled.input`
+  height: 52px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid ${Colors.grayline};
+  background: white;
+  border-radius: 3px;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  font-weight: light;
+
+  &:valid,
+  &:focus {
+    color: black;
+    font-weight: light;
+    border: 1px solid ${Colors.amethyst};
+  }
+`;
+
+const OrgLabel = styled.span`
+  position: absolute;
+  left: 0;
+  padding: 15px;
+
+  font-size: 16px;
+  color: ${Colors.grayline};
+  transition: 0.5s;
+  pointer-events: none;
+
+  ${OrgInput}:valid + &,
+  ${OrgInput}:focus + & {
     color: ${Colors.amethyst};
     transform: translateX(10px) translateY(-25px);
     font-size: 14px;
@@ -199,6 +250,36 @@ const LoginWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(138, 77, 211, 0.2);
+    cursor: pointer;
+  }
+`;
+
+const BlockWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+`;
+
+const SubtitleZ = styled.p`
+  text-align: center;
+  font-size: 14px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: black;
 `;
 
 const Underline = styled.div`
@@ -281,64 +362,55 @@ const EditBox = styled.div`
   display: flex;
 `;
 
-const ErrorWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin: 0;
-  padding: 5px 0 10px 0;
-`;
-
-const ErrorText = styled.p`
-  font-size: 12px;
-  color: ${Colors.error};
-  margin: 0;
-  padding: 0;
-`;
-
-const local = process.env.REACT_APP_LOCAL_URL;
-
-const SetPasswordPage = (props: Props) => {
+const ConfirmEmail = () => {
   const router = useRouter();
-  const email = router.query.email;
-  const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const { token, email, hashedPassword } = router.query;
+  const [org, setOrg] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const local = process.env.REACT_APP_LOCAL_URL;
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission behavior.
+  useEffect(() => {
+    const confirmUser = async () => {
+      if (token && email && hashedPassword) {
+        try {
+          const response = await axios.post(`${local}/u/confirm-user`, {
+            confirmationToken: token,
+            email,
+            hashedPassword,
+          });
+          console.log(response.data);
+          // TODO: Handle successful confirmation. Maybe redirect to a success page?
+        } catch (error) {
+          console.error(`Error: ${error}`);
+          // TODO: Handle error. Maybe show an error message to the user?
+        }
+      }
+    };
 
-    console.log(`Form submitted with email: ${email}`);
-
-    //axios call
-    try {
-      const response = await axios.post(`${local}/u/register`, {
-        email,
-        password,
-      });
-      console.log(response.data.message, "msg");
-
-      // Navigate to the email verification page
-      router.push({
-        pathname: "/onboarding",
-        query: { email },
-      });
-    } catch (error) {
-      console.error(`Error => ${error.response.data.error}`);
-      setIsError(true);
-      setError(error.response.data.error);
+    if (token && email && hashedPassword) {
+      confirmUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, email, hashedPassword]);
+
+  const handleOrgChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setOrg(event.target.value);
   };
 
-  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
+  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFirstName(event.target.value);
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setLastName(event.target.value);
   };
 
+  const handleBdChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setBd(event.target.value);
+  };
+
+  const handleSubmit = async () => {};
   return (
     <PageContainer>
       <Wrapper>
@@ -352,68 +424,26 @@ const SetPasswordPage = (props: Props) => {
         <Section>
           <Content>
             <Header>
-              <CreateText>Create your account</CreateText>
-              <Subtitle>
-                Please be aware that we may need to verify your identity via
-                phone during the signup process. Rest assured, your phone number
-                will solely be used for this security measure.
-              </Subtitle>
+              <CreateText>Tell us about yourself</CreateText>
             </Header>
-            <EmailDiv>
-              <SignupForm onSubmit={handleSubmit}>
-                <InputBox>
-                  <EmailInput
-                    type="email"
-                    required="required"
-                    value={email}
-                    disabled={true}
-                  />
-                </InputBox>
-                <EditBox>
-                  <EditWrapper>
-                    <EditLabel href={"/login"}>Edit</EditLabel>
-                  </EditWrapper>
-                </EditBox>
-                {isError === true && error === "User already exists" ? (
-                  <ErrorWrapper>
-                    <ErrorIcon
-                      style={{
-                        color: Colors.error,
-                        width: "18px",
-                        height: "18px",
-                      }}
-                    />
-                    <ErrorText>{error}</ErrorText>
-                  </ErrorWrapper>
-                ) : null}
+            <SignupForm onSubmit={handleSubmit}>
+              <InputBox>
+                <OrgInput type="text" value={org} onChange={handleOrgChange} />
 
-                <PassBox>
-                  <EmailInput
-                    type={showPassword ? "text" : "password"}
-                    minLength={8}
-                    required="required"
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
+                <OrgLabel>Organization Name</OrgLabel>
+              </InputBox>
+              <BdBox>
+                <BirthdayInput
+                  type="text"
+                  value={org}
+                  onChange={handleBdChange}
+                />
 
-                  <EmailLabel>Password</EmailLabel>
-                  {showPassword === true ? (
-                    <EyeWrapper onClick={togglePasswordVisibility}>
-                      <VisibilityOffIcon style={{ color: Colors.grayline }} />
-                    </EyeWrapper>
-                  ) : (
-                    <EyeWrapper onClick={togglePasswordVisibility}>
-                      <VisibilityIcon style={{ color: Colors.grayline }} />
-                    </EyeWrapper>
-                  )}
-                </PassBox>
-                <SignupBtn type="submit">Continue</SignupBtn>
-              </SignupForm>
-              <LoginWrapper>
-                <Subtitle>Already have an account?</Subtitle>
-                <XtraSubtitle href="/login">Log in</XtraSubtitle>
-              </LoginWrapper>
-            </EmailDiv>
+                <BirthdayLabel>Birthday</BirthdayLabel>
+              </BdBox>
+
+              <SignupBtn type="submit">Continue</SignupBtn>
+            </SignupForm>
           </Content>
         </Section>
       </Wrapper>
@@ -432,4 +462,4 @@ const SetPasswordPage = (props: Props) => {
   );
 };
 
-export default SetPasswordPage;
+export default ConfirmEmail;

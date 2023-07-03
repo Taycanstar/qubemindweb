@@ -9,4 +9,5 @@ export default {
   amethyst: "#9b5de5",
   darkAmethyst: "#8a4dd3",
   hoverGray: "#dcdcdc",
+  error: "rgba(195,0,20,1)",
 };
