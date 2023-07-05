@@ -54,7 +54,7 @@ const SubtitleY = styled.p`
 
 const Subtitle = styled.p`
   text-align: center;
-  font-size: 16px;
+  font-size: 12px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -62,7 +62,8 @@ const Subtitle = styled.p`
   margin-inline-end: 0px;
   line-height: 1.5;
   font-weight: 400;
-  margin: 0;
+  // margin: 0;
+  margin-bottom: 10px;
 `;
 
 const Header = styled.div`
@@ -108,11 +109,11 @@ const BirthdayInput = styled.input`
   font-size: 16px;
   font-weight: light;
 
-  &:valid,
+  // &:valid,
   &:focus {
     color: black;
     font-weight: light;
-    border: 1px solid ${Colors.amethyst};
+    border: 2px solid ${Colors.amethyst};
   }
 `;
 
@@ -149,11 +150,11 @@ const OrgInput = styled.input`
   font-size: 16px;
   font-weight: light;
 
-  &:valid,
+  // &:valid,
   &:focus {
     color: black;
     font-weight: light;
-    border: 1px solid ${Colors.amethyst};
+    border: 2px solid ${Colors.amethyst};
   }
 `;
 
@@ -362,13 +363,58 @@ const EditBox = styled.div`
   display: flex;
 `;
 
+const NameWrapper = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+`;
+
+const NameInput = styled.input`
+  height: 52px;
+  box-sizing: border-box;
+  width: 50%;
+  padding: 15px;
+  border: 1px solid ${Colors.grayline};
+  background: white;
+  border-radius: 3px;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  font-weight: light;
+
+  // &:valid,
+  &:focus {
+    color: black;
+    font-weight: light;
+    border: 2px solid ${Colors.amethyst};
+  }
+`;
+
+const LinkTerm = styled(Link)`
+  text-align: center;
+  font-size: 12px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: ${Colors.amethyst};
+`;
+
 const ConfirmEmail = () => {
   const router = useRouter();
   const { token, email, hashedPassword } = router.query;
   const [org, setOrg] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [bd, setBd] = useState<string>("");
   const local = process.env.REACT_APP_LOCAL_URL;
+  const [isBdFocused, setIsBdFocused] = useState<boolean>(false);
+  const [isOrgFocused, setIsOrgFocused] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const confirmUser = async () => {
@@ -381,6 +427,9 @@ const ConfirmEmail = () => {
           });
           console.log(response.data);
           // TODO: Handle successful confirmation. Maybe redirect to a success page?
+
+          const userId = response.data.user._id;
+          setUserId(userId);
         } catch (error) {
           console.error(`Error: ${error}`);
           // TODO: Handle error. Maybe show an error message to the user?
@@ -406,11 +455,72 @@ const ConfirmEmail = () => {
     setLastName(event.target.value);
   };
 
-  const handleBdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setBd(event.target.value);
+  useEffect(() => {
+    const checkUserExists = async () => {
+      try {
+        const response = await axios.get(
+          `${local}/u/check-user-exists?email=${email}`
+        );
+        setUserId(response.data.user._id);
+        console.log(userId, "new");
+        console.log(response.data.user._id, "<= user exists");
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      }
+    };
+
+    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(intervalId); // Clean up on component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]);
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault(); // Prevent the default form submission behavior.
+
+    try {
+      const response = await axios.put(
+        `${local}/u/add-personal-info/${userId}`,
+        {
+          firstName,
+          lastName,
+          organizationName: org,
+          birthday: bd,
+        }
+      );
+
+      console.log(response, "<= success");
+      // Navigate to the new page with email as a query parameter
+      router.push({
+        pathname: "/verify-number",
+        query: {
+          firstName,
+          lastName,
+          organizationName: org,
+          birthday: bd,
+          userId,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleSubmit = async () => {};
+  const handleBdFocus = () => {
+    setIsBdFocused(true);
+  };
+
+  const handleBdBlur = () => {
+    setIsBdFocused(false);
+  };
+
+  const handleOrgFocus = () => {
+    setIsOrgFocused(true);
+  };
+
+  const handleOrgBlur = () => {
+    setIsOrgFocused(false);
+  };
+
   return (
     <PageContainer>
       <Wrapper>
@@ -428,36 +538,65 @@ const ConfirmEmail = () => {
             </Header>
             <SignupForm onSubmit={handleSubmit}>
               <InputBox>
-                <OrgInput type="text" value={org} onChange={handleOrgChange} />
-
-                <OrgLabel>Organization Name</OrgLabel>
+                <NameWrapper>
+                  <NameInput
+                    type="text"
+                    value={firstName}
+                    onChange={handleFirstNameChange}
+                    placeholder="First name"
+                  />
+                  <NameInput
+                    type="text"
+                    value={lastName}
+                    onChange={handleLastNameChange}
+                    placeholder="Last name"
+                  />
+                </NameWrapper>
+              </InputBox>
+              <InputBox>
+                <OrgInput
+                  type="text"
+                  value={org}
+                  onChange={handleOrgChange}
+                  placeholder="Organization name (optional)"
+                />
               </InputBox>
               <BdBox>
                 <BirthdayInput
                   type="text"
-                  value={org}
-                  onChange={handleBdChange}
-                />
+                  value={bd}
+                  onChange={(event) => {
+                    const input = event.target.value.replace(/\D/g, ""); // Remove non-digit characters
+                    let formattedDate = "";
 
-                <BirthdayLabel>Birthday</BirthdayLabel>
+                    if (input.length > 0) {
+                      formattedDate += input.substr(0, 2);
+                    }
+                    if (input.length > 2) {
+                      formattedDate += "/" + input.substr(2, 2);
+                    }
+                    if (input.length > 4) {
+                      formattedDate += "/" + input.substr(4, 4);
+                    }
+
+                    setBd(formattedDate);
+                  }}
+                  placeholder={isBdFocused ? "MM/DD/YYYY" : "Birthday"}
+                  onFocus={handleBdFocus}
+                  onBlur={handleBdBlur}
+                />
               </BdBox>
 
               <SignupBtn type="submit">Continue</SignupBtn>
             </SignupForm>
+            <Subtitle>
+              By proceeding with "Continue" you consent to our{" "}
+              <LinkTerm href="/terms">Terms of Service</LinkTerm> and recognize
+              our <LinkTerm href="privacy-policy">Privacy Policy.</LinkTerm>
+            </Subtitle>
           </Content>
         </Section>
       </Wrapper>
-      <Footer>
-        <FooterWrapper>
-          <StyledFooterDiv>
-            <FooterText href="/terms">Terms of use</FooterText>
-          </StyledFooterDiv>
-          <Separator></Separator>
-          <StyledFooterDiv>
-            <FooterText href="/privacy-policy">Privacy policy</FooterText>
-          </StyledFooterDiv>
-        </FooterWrapper>
-      </Footer>
     </PageContainer>
   );
 };

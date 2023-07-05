@@ -95,7 +95,7 @@ const EmailInput = styled.input`
   &:focus {
     color: black;
     font-weight: light;
-    border: 1px solid ${Colors.amethyst};
+    border: 2px solid ${Colors.amethyst};
   }
 `;
 
