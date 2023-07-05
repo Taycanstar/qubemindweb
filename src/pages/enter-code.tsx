@@ -2,7 +2,7 @@
 // confirmEmail.tsx
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
@@ -410,39 +410,48 @@ const LinkTerm = styled(Link)`
 
 const EnterCode = () => {
   const router = useRouter();
-  const { userId } = router.query;
+  const { userId, phoneNumber } = router.query;
   const local = process.env.REACT_APP_LOCAL_URL;
   const [value, setValue] = useState<string | undefined>();
   const [isResendActive, setIsResendActive] = useState<boolean>(true);
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(async () => {
     try {
       const response = await axios.post(
         `${local}/u/confirm-phone-number/${userId}`,
         {
           otpCode: value,
-          phoneNumber: router.query.phoneNumber,
+          phoneNumber: `+${phoneNumber}`,
         }
       );
       console.log(response.data.message);
       if (response.status === 200) {
         // move to the next step in your flow
+        console.log("success, phone number verified");
+
+        //   router.push({
+        //     pathname: "/overview",
+        //   });
       } else {
         console.log("Code verification failed.");
       }
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [local, userId, value, router.query.phoneNumber]);
+
+  useEffect(() => {
+    if (value && value.length === 6) {
+      handleSubmit();
+    }
+  }, [value, handleSubmit]);
 
   const onResend = async (event: FormEvent) => {
     try {
       event.preventDefault();
-      //   const response = await axios.post(`${local}/u/resend-text`, {
-      //     phoneNumber: value,
-      //   });
-      //   console.log(response.data.message);
+      const response = await axios.post(`${local}/u/resend-code`, {
+        phoneNumber: `+${phoneNumber}`,
+      });
 
       setIsResendActive(false);
       setTimeout(() => {
@@ -490,7 +499,7 @@ const EnterCode = () => {
                 <SubtitleY>Resend code</SubtitleY>
               </LoginWrapper>
             ) : (
-              <BlockWrapper onClick={onResend}>
+              <BlockWrapper>
                 <SubtitleZ>Code sent.</SubtitleZ>
               </BlockWrapper>
             )}

@@ -462,8 +462,6 @@ const ConfirmEmail = () => {
           `${local}/u/check-user-exists?email=${email}`
         );
         setUserId(response.data.user._id);
-        console.log(userId, "new");
-        console.log(response.data.user._id, "<= user exists");
       } catch (error) {
         console.error(`Error: ${error}`);
       }

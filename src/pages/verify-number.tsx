@@ -417,9 +417,9 @@ const VerifyNumber = () => {
     event.preventDefault();
     try {
       const response = await axios.post(`${local}/u/send-code`, {
-        phoneNumber: value,
+        phoneNumber: `+${value}`,
       });
-      console.log(response.data.message);
+
       router.push({
         pathname: "/enter-code",
         query: {

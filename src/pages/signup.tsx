@@ -368,7 +368,7 @@ const SignupPage = (props: Props) => {
                 <StyledImage
                   alt="apple Logo"
                   src={appleLogo}
-                  style={{ objectFit: "cover", width: "30px", height: "30px" }}
+                  style={{ objectFit: "cover", width: "20px", height: "20px" }}
                 />
               </LogoWrapper>
               <GText>Continue with Apple</GText>
