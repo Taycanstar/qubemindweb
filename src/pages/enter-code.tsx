@@ -429,9 +429,9 @@ const EnterCode = () => {
         // move to the next step in your flow
         console.log("success, phone number verified");
 
-        //   router.push({
-        //     pathname: "/overview",
-        //   });
+        router.push({
+          pathname: "/platform/apps",
+        });
       } else {
         console.log("Code verification failed.");
       }

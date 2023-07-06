@@ -20,14 +20,6 @@ import { Navigation } from "./Navigation";
 import { useDimensions } from "./use-dimensions";
 import { useScrollLock } from "./ScrollLockContext";
 
-// const StyledHeader = styled(({ bgColor, ...props }) => <header {...props} />)`
-//   position: sticky;
-//   top: 0;
-//   z-index: 100;
-//   transition: 0.3s;
-
-//   background-color: ${(props) => (props.bgColor ? "#000" : "rgba(0, 0, 0, 0)")};
-// `;
 const StyledHeader = styled.header`
   position: sticky;
   top: 0;
@@ -43,6 +35,7 @@ const Logo = styled.span`
   text-decoration: none;
   font-size: 24px;
   font-weight: 500;
+  margin: 0 -15px;
 `;
 
 const LogoContainer = styled.div`
