@@ -7,6 +7,7 @@ import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
+import Spinner from "@components/Spinner";
 import { transparentLogo } from "../app/utils/images/ImageAssets";
 // import PhoneInput from "react-phone-number-input";
 import PhoneInput from "react-phone-input-2";
@@ -414,6 +415,7 @@ const EnterCode = () => {
   const local = process.env.REACT_APP_LOCAL_URL;
   const [value, setValue] = useState<string | undefined>();
   const [isResendActive, setIsResendActive] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = useCallback(async () => {
     try {
@@ -424,11 +426,14 @@ const EnterCode = () => {
           phoneNumber: `+${phoneNumber}`,
         }
       );
-      console.log(response.data.message);
+      // console.log(response.data.message);
       if (response.status === 200) {
         // move to the next step in your flow
         console.log("success, phone number verified");
-
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
         router.push({
           pathname: "/platform/apps",
         });
@@ -477,33 +482,37 @@ const EnterCode = () => {
           height={100}
         />
         <Section>
-          <Content>
-            <Header>
-              <CreateText>Enter code</CreateText>
-              <SubtitleZ>
-                Input the code that was recently sent to you.
-              </SubtitleZ>
-            </Header>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Content>
+              <Header>
+                <CreateText>Enter code</CreateText>
+                <SubtitleZ>
+                  Input the code that was recently sent to you.
+                </SubtitleZ>
+              </Header>
 
-            <InputBox>
-              <OrgInput
-                type="text"
-                value={value}
-                onChange={handleCodeChange}
-                placeholder="000 000"
-                maxLength={6}
-              />
-            </InputBox>
-            {isResendActive ? (
-              <LoginWrapper onClick={onResend}>
-                <SubtitleY>Resend code</SubtitleY>
-              </LoginWrapper>
-            ) : (
-              <BlockWrapper>
-                <SubtitleZ>Code sent.</SubtitleZ>
-              </BlockWrapper>
-            )}
-          </Content>
+              <InputBox>
+                <OrgInput
+                  type="text"
+                  value={value}
+                  onChange={handleCodeChange}
+                  placeholder="000 000"
+                  maxLength={6}
+                />
+              </InputBox>
+              {isResendActive ? (
+                <LoginWrapper onClick={onResend}>
+                  <SubtitleY>Resend code</SubtitleY>
+                </LoginWrapper>
+              ) : (
+                <BlockWrapper>
+                  <SubtitleZ>Code sent.</SubtitleZ>
+                </BlockWrapper>
+              )}
+            </Content>
+          )}
         </Section>
       </Wrapper>
     </PageContainer>
