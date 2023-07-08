@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import Image from "next/image";
@@ -6,7 +7,7 @@ import {
   googleLogo,
   appleLogo,
   microsoftLogo,
-} from "../app/utils/images/ImageAssets";
+} from "../../app/utils/images/ImageAssets";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -272,24 +273,35 @@ const Separator = styled.div`
   border-left: 1px solid ${Colors.amethyst};
 `;
 
-const SignupPage = (props: Props) => {
-  const [email, setEmail] = useState<string>("");
+const LoginPage = (props: Props) => {
+  const [loginValue, setLoginValue] = useState<string>("");
+  const [loginType, setLoginType] = useState<string>("text");
   const router = useRouter();
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault(); // Prevent the default form submission behavior.
 
-    console.log(`Form submitted with email: ${email}`);
-
     // Navigate to the new page with email as a query parameter
     router.push({
-      pathname: "/onboarding/password",
-      query: { email },
+      pathname: "/login/identifier",
+      query: { value: loginValue, loginType },
     });
   };
 
-  const handleEmailChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
+  const handleValueChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const enteredValue = event.target.value;
+    // Regular expression pattern to check if the entered value is an email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (emailPattern.test(enteredValue)) {
+      // The entered value is an email
+      setLoginType("email");
+    } else {
+      // The entered value is a username
+      setLoginType("text");
+    }
+
+    setLoginValue(enteredValue);
   };
 
   return (
@@ -302,29 +314,24 @@ const SignupPage = (props: Props) => {
       <Section>
         <Content>
           <Header>
-            <CreateText>Create your account</CreateText>
-            <Subtitle>
-              Please be aware that we may need to verify your identity via phone
-              during the signup process. Rest assured, your phone number will
-              solely be used for this security measure.
-            </Subtitle>
+            <CreateText>Hello again</CreateText>
           </Header>
           <EmailDiv>
             <SignupForm onSubmit={handleSubmit}>
               <InputBox>
                 <EmailInput
-                  type="email"
+                  type={loginType}
                   required="required"
-                  value={email}
-                  onChange={handleEmailChange}
+                  value={loginValue}
+                  onChange={handleValueChange}
                 />
-                <EmailLabel>Email address</EmailLabel>
+                <EmailLabel>Email or username</EmailLabel>
               </InputBox>
               <SignupBtn type="submit">Continue</SignupBtn>
             </SignupForm>
             <LoginWrapper>
-              <Subtitle>Already have an account?</Subtitle>
-              <XtraSubtitle href="/login">Log in</XtraSubtitle>
+              <Subtitle>Don't have an account?</Subtitle>
+              <XtraSubtitle href="/signup">Sign up</XtraSubtitle>
             </LoginWrapper>
           </EmailDiv>
           <InputBox>
@@ -391,4 +398,4 @@ const SignupPage = (props: Props) => {
   );
 };
 
-export default SignupPage;
+export default LoginPage;

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { transparentLogo } from "../app/utils/images/ImageAssets";
+import { transparentLogo } from "../../app/utils/images/ImageAssets";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
@@ -415,7 +415,7 @@ const OnboardingPage = (props: Props) => {
                 <SubtitleY>Resend email</SubtitleY>
               </LoginWrapper>
             ) : (
-              <BlockWrapper onClick={onResend}>
+              <BlockWrapper>
                 <SubtitleZ>Email sent.</SubtitleZ>
               </BlockWrapper>
             )}

@@ -2,12 +2,15 @@
 // confirmEmail.tsx
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import { transparentLogo } from "../app/utils/images/ImageAssets";
+import Spinner from "@components/Spinner";
+import { transparentLogo } from "../../app/utils/images/ImageAssets";
+// import PhoneInput from "react-phone-number-input";
+import PhoneInput from "react-phone-input-2";
 
 const Wrapper = styled.div`
   display: flex;
@@ -86,6 +89,7 @@ const InputBox = styled.div`
   width: 100%;
   align-items: center;
   justify-content: center;
+  margin-bottom: 24px;
 `;
 
 const BdBox = styled.div`
@@ -149,6 +153,7 @@ const OrgInput = styled.input`
   color: black;
   font-size: 16px;
   font-weight: light;
+  text-align: center;
 
   // &:valid,
   &:focus {
@@ -265,13 +270,13 @@ const BlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 5px;
+  //   padding: 39px;
   border-radius: 4px;
 `;
 
 const SubtitleZ = styled.p`
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -404,119 +409,66 @@ const LinkTerm = styled(Link)`
   color: ${Colors.amethyst};
 `;
 
-const ConfirmEmail = () => {
+const EnterCode = () => {
   const router = useRouter();
-  const { token, email, hashedPassword } = router.query;
-  const [org, setOrg] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [bd, setBd] = useState<string>("");
+  const { userId, phoneNumber } = router.query;
   const local = process.env.REACT_APP_LOCAL_URL;
-  const [isBdFocused, setIsBdFocused] = useState<boolean>(false);
-  const [isOrgFocused, setIsOrgFocused] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [value, setValue] = useState<string | undefined>();
+  const [isResendActive, setIsResendActive] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    const confirmUser = async () => {
-      if (token && email && hashedPassword) {
-        try {
-          const response = await axios.post(`${local}/u/confirm-user`, {
-            confirmationToken: token,
-            email,
-            hashedPassword,
-          });
-          console.log(response.data);
-          // TODO: Handle successful confirmation. Maybe redirect to a success page?
-
-          const userId = response.data.user._id;
-          setUserId(userId);
-        } catch (error) {
-          console.error(`Error: ${error}`);
-          // TODO: Handle error. Maybe show an error message to the user?
-        }
-      }
-    };
-
-    if (token && email && hashedPassword) {
-      confirmUser();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, email, hashedPassword]);
-
-  const handleOrgChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setOrg(event.target.value);
-  };
-
-  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFirstName(event.target.value);
-  };
-
-  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLastName(event.target.value);
-  };
-
-  useEffect(() => {
-    const checkUserExists = async () => {
-      try {
-        const response = await axios.get(
-          `${local}/u/check-user-exists?email=${email}`
-        );
-        setUserId(response.data.user._id);
-      } catch (error) {
-        console.error(`Error: ${error}`);
-      }
-    };
-
-    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(intervalId); // Clean up on component unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email]);
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission behavior.
-
+  const handleSubmit = useCallback(async () => {
     try {
-      const response = await axios.put(
-        `${local}/u/add-personal-info/${userId}`,
+      const response = await axios.post(
+        `${local}/u/confirm-phone-number/${userId}`,
         {
-          firstName,
-          lastName,
-          organizationName: org,
-          birthday: bd,
+          otpCode: value,
+          phoneNumber: `+${phoneNumber}`,
         }
       );
+      // console.log(response.data.message);
+      if (response.status === 200) {
+        // move to the next step in your flow
+        console.log("success, phone number verified");
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+        router.push({
+          pathname: "/platform/apps",
+        });
+      } else {
+        console.log("Code verification failed.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [local, userId, value, router.query.phoneNumber]);
 
-      console.log(response, "<= success");
-      // Navigate to the new page with email as a query parameter
-      router.push({
-        pathname: "/verify-number",
-        query: {
-          firstName,
-          lastName,
-          organizationName: org,
-          birthday: bd,
-          userId,
-        },
+  useEffect(() => {
+    if (value && value.length === 6) {
+      handleSubmit();
+    }
+  }, [value, handleSubmit]);
+
+  const onResend = async (event: FormEvent) => {
+    try {
+      event.preventDefault();
+      const response = await axios.post(`${local}/u/resend-code`, {
+        phoneNumber: `+${phoneNumber}`,
       });
+
+      setIsResendActive(false);
+      setTimeout(() => {
+        setIsResendActive(true);
+      }, 15000);
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleBdFocus = () => {
-    setIsBdFocused(true);
-  };
-
-  const handleBdBlur = () => {
-    setIsBdFocused(false);
-  };
-
-  const handleOrgFocus = () => {
-    setIsOrgFocused(true);
-  };
-
-  const handleOrgBlur = () => {
-    setIsOrgFocused(false);
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
   };
 
   return (
@@ -530,73 +482,41 @@ const ConfirmEmail = () => {
           height={100}
         />
         <Section>
-          <Content>
-            <Header>
-              <CreateText>Tell us about yourself</CreateText>
-            </Header>
-            <SignupForm onSubmit={handleSubmit}>
-              <InputBox>
-                <NameWrapper>
-                  <NameInput
-                    type="text"
-                    value={firstName}
-                    onChange={handleFirstNameChange}
-                    placeholder="First name"
-                  />
-                  <NameInput
-                    type="text"
-                    value={lastName}
-                    onChange={handleLastNameChange}
-                    placeholder="Last name"
-                  />
-                </NameWrapper>
-              </InputBox>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Content>
+              <Header>
+                <CreateText>Enter code</CreateText>
+                <SubtitleZ>
+                  Input the code that was recently sent to you.
+                </SubtitleZ>
+              </Header>
+
               <InputBox>
                 <OrgInput
                   type="text"
-                  value={org}
-                  onChange={handleOrgChange}
-                  placeholder="Organization name (optional)"
+                  value={value}
+                  onChange={handleCodeChange}
+                  placeholder="000 000"
+                  maxLength={6}
                 />
               </InputBox>
-              <BdBox>
-                <BirthdayInput
-                  type="text"
-                  value={bd}
-                  onChange={(event) => {
-                    const input = event.target.value.replace(/\D/g, ""); // Remove non-digit characters
-                    let formattedDate = "";
-
-                    if (input.length > 0) {
-                      formattedDate += input.substr(0, 2);
-                    }
-                    if (input.length > 2) {
-                      formattedDate += "/" + input.substr(2, 2);
-                    }
-                    if (input.length > 4) {
-                      formattedDate += "/" + input.substr(4, 4);
-                    }
-
-                    setBd(formattedDate);
-                  }}
-                  placeholder={isBdFocused ? "MM/DD/YYYY" : "Birthday"}
-                  onFocus={handleBdFocus}
-                  onBlur={handleBdBlur}
-                />
-              </BdBox>
-
-              <SignupBtn type="submit">Continue</SignupBtn>
-            </SignupForm>
-            <Subtitle>
-              By proceeding with "Continue" you consent to our{" "}
-              <LinkTerm href="/terms">Terms of Service</LinkTerm> and recognize
-              our <LinkTerm href="privacy-policy">Privacy Policy.</LinkTerm>
-            </Subtitle>
-          </Content>
+              {isResendActive ? (
+                <LoginWrapper onClick={onResend}>
+                  <SubtitleY>Resend code</SubtitleY>
+                </LoginWrapper>
+              ) : (
+                <BlockWrapper>
+                  <SubtitleZ>Code sent.</SubtitleZ>
+                </BlockWrapper>
+              )}
+            </Content>
+          )}
         </Section>
       </Wrapper>
     </PageContainer>
   );
 };
 
-export default ConfirmEmail;
+export default EnterCode;
