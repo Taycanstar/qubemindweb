@@ -7,7 +7,9 @@ import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
+// import PhoneInput from "react-phone-number-input";
+import PhoneInput from "react-phone-input-2";
 
 const Wrapper = styled.div`
   display: flex;
@@ -265,22 +267,22 @@ const BlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 5px;
+  padding: 39px;
   border-radius: 4px;
 `;
 
 const SubtitleZ = styled.p`
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
   margin-inline-start: 0px;
   margin-inline-end: 0px;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 500;
   margin: 0;
-  color: black;
+  color: ${Colors.amethyst};
 `;
 
 const Underline = styled.div`
@@ -404,97 +406,24 @@ const LinkTerm = styled(Link)`
   color: ${Colors.amethyst};
 `;
 
-const ConfirmEmail = () => {
+const VerifyNumber = () => {
   const router = useRouter();
-  const { token, email, hashedPassword } = router.query;
-  const [org, setOrg] = useState<string>("");
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [bd, setBd] = useState<string>("");
-  const local = process.env.REACT_APP_LOCAL_URL;
-  const [isBdFocused, setIsBdFocused] = useState<boolean>(false);
-  const [isOrgFocused, setIsOrgFocused] = useState<boolean>(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const { userId } = router.query;
+  const LOCAL = process.env.REACT_APP_LOCAL_URL;
+  const [value, setValue] = useState<string | undefined>();
+  const [isResendActive, setIsResendActive] = useState<boolean>(true);
 
-  useEffect(() => {
-    const confirmUser = async () => {
-      if (token && email && hashedPassword) {
-        try {
-          const response = await axios.post(`${local}/u/confirm-user`, {
-            confirmationToken: token,
-            email,
-            hashedPassword,
-          });
-          console.log(response.data);
-          // TODO: Handle successful confirmation. Maybe redirect to a success page?
-
-          const userId = response.data.user._id;
-          setUserId(userId);
-        } catch (error) {
-          console.error(`Error: ${error}`);
-          // TODO: Handle error. Maybe show an error message to the user?
-        }
-      }
-    };
-
-    if (token && email && hashedPassword) {
-      confirmUser();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, email, hashedPassword]);
-
-  const handleOrgChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setOrg(event.target.value);
-  };
-
-  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setFirstName(event.target.value);
-  };
-
-  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setLastName(event.target.value);
-  };
-
-  useEffect(() => {
-    const checkUserExists = async () => {
-      try {
-        const response = await axios.get(
-          `${local}/u/check-user-exists?email=${email}`
-        );
-        setUserId(response.data.user._id);
-      } catch (error) {
-        console.error(`Error: ${error}`);
-      }
-    };
-
-    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(intervalId); // Clean up on component unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email]);
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission behavior.
-
+    event.preventDefault();
     try {
-      const response = await axios.put(
-        `${local}/u/add-personal-info/${userId}`,
-        {
-          firstName,
-          lastName,
-          organizationName: org,
-          birthday: bd,
-        }
-      );
+      const response = await axios.post(`${LOCAL}/u/send-code`, {
+        phoneNumber: `+${value}`,
+      });
 
-      console.log(response, "<= success");
-      // Navigate to the new page with email as a query parameter
       router.push({
-        pathname: "/onboarding/phone-number",
+        pathname: "/auth/onboarding/verify",
         query: {
-          firstName,
-          lastName,
-          organizationName: org,
-          birthday: bd,
+          phoneNumber: value,
           userId,
         },
       });
@@ -502,23 +431,6 @@ const ConfirmEmail = () => {
       console.log(error);
     }
   };
-
-  const handleBdFocus = () => {
-    setIsBdFocused(true);
-  };
-
-  const handleBdBlur = () => {
-    setIsBdFocused(false);
-  };
-
-  const handleOrgFocus = () => {
-    setIsOrgFocused(true);
-  };
-
-  const handleOrgBlur = () => {
-    setIsOrgFocused(false);
-  };
-
   return (
     <PageContainer>
       <Wrapper>
@@ -532,66 +444,26 @@ const ConfirmEmail = () => {
         <Section>
           <Content>
             <Header>
-              <CreateText>Tell us about yourself</CreateText>
+              <CreateText>Verify your phone number</CreateText>
             </Header>
             <SignupForm onSubmit={handleSubmit}>
-              <InputBox>
-                <NameWrapper>
-                  <NameInput
-                    type="text"
-                    value={firstName}
-                    onChange={handleFirstNameChange}
-                    placeholder="First name"
-                  />
-                  <NameInput
-                    type="text"
-                    value={lastName}
-                    onChange={handleLastNameChange}
-                    placeholder="Last name"
-                  />
-                </NameWrapper>
-              </InputBox>
-              <InputBox>
-                <OrgInput
-                  type="text"
-                  value={org}
-                  onChange={handleOrgChange}
-                  placeholder="Organization name (optional)"
-                />
-              </InputBox>
-              <BdBox>
-                <BirthdayInput
-                  type="text"
-                  value={bd}
-                  onChange={(event) => {
-                    const input = event.target.value.replace(/\D/g, ""); // Remove non-digit characters
-                    let formattedDate = "";
+              <PhoneInput
+                country={"us"}
+                placeholder="Enter phone number"
+                value={value}
+                onChange={setValue}
+                inputStyle={{
+                  height: "52px",
+                  width: "100%",
+                }}
+                containerStyle={{
+                  height: "52px",
+                  width: "100%",
+                }}
+              />
 
-                    if (input.length > 0) {
-                      formattedDate += input.substr(0, 2);
-                    }
-                    if (input.length > 2) {
-                      formattedDate += "/" + input.substr(2, 2);
-                    }
-                    if (input.length > 4) {
-                      formattedDate += "/" + input.substr(4, 4);
-                    }
-
-                    setBd(formattedDate);
-                  }}
-                  placeholder={isBdFocused ? "MM/DD/YYYY" : "Birthday"}
-                  onFocus={handleBdFocus}
-                  onBlur={handleBdBlur}
-                />
-              </BdBox>
-
-              <SignupBtn type="submit">Continue</SignupBtn>
+              <SignupBtn type="submit">Send code</SignupBtn>
             </SignupForm>
-            <Subtitle>
-              By proceeding with "Continue" you consent to our{" "}
-              <LinkTerm href="/terms">Terms of Service</LinkTerm> and recognize
-              our <LinkTerm href="privacy-policy">Privacy Policy.</LinkTerm>
-            </Subtitle>
           </Content>
         </Section>
       </Wrapper>
@@ -599,4 +471,4 @@ const ConfirmEmail = () => {
   );
 };
 
-export default ConfirmEmail;
+export default VerifyNumber;

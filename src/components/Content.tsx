@@ -172,7 +172,7 @@ const Content: React.FC = () => {
             Create your own personalized virtual <TypewriterEffect />
           </Title>
           {/* <Subtitle></Subtitle> */}
-          <StyledDetailsDiv href={"/login"}>
+          <StyledDetailsDiv href={"/auth/login"}>
             <Details>Get started</Details>
           </StyledDetailsDiv>
         </div>

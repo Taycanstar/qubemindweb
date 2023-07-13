@@ -4,13 +4,10 @@ import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
-import ErrorIcon from "@mui/icons-material/Error";
-import { useDispatch, useSelector } from "react-redux";
-import { loginUser, fetchUserByValue } from "../../app/store/user";
 
 type Props = {};
 
@@ -43,9 +40,23 @@ const CreateText = styled.h1`
   margin: 15px 0;
 `;
 
-const Subtitle = styled.p`
+const SubtitleY = styled.p`
   text-align: center;
   font-size: 14px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: ${Colors.amethyst};
+`;
+
+const Subtitle = styled.p`
+  text-align: center;
+  font-size: 16px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -104,7 +115,7 @@ const EmailInput = styled.input`
   &:focus {
     color: black;
     font-weight: light;
-    border: 2px solid ${Colors.amethyst};
+    border: 1px solid ${Colors.amethyst};
   }
 `;
 
@@ -201,6 +212,36 @@ const LoginWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(138, 77, 211, 0.2);
+    cursor: pointer;
+  }
+`;
+
+const BlockWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px;
+  border-radius: 4px;
+`;
+
+const SubtitleZ = styled.p`
+  text-align: center;
+  font-size: 14px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: black;
 `;
 
 const Underline = styled.div`
@@ -283,168 +324,101 @@ const EditBox = styled.div`
   display: flex;
 `;
 
-const ErrorWrapper = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin: 0;
-  padding: 5px 0 10px 0;
-`;
-
-const ErrorText = styled.p`
-  font-size: 12px;
-  color: ${Colors.error};
-  margin: 0;
-  padding: 0;
-`;
-
 const local = process.env.REACT_APP_LOCAL_URL;
 
-interface User {
-  [key: string]: any;
-}
-
-const IdentifierPage = (props: Props) => {
+const OnboardingPage = (props: Props) => {
   const router = useRouter();
-  const { value, loginType } = router.query;
-  const [password, setPassword] = useState<string>("");
-  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const { token, email, hashedPassword } = router.query;
+  const [userExists, setUserExists] = useState<boolean>(false);
+  const [isResendActive, setIsResendActive] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const dispatch = useDispatch();
-  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const checkUserExists = async () => {
       try {
-        const response = await dispatch(fetchUserByValue(value));
-        if (response.payload) {
-          setUser(response.payload); // Access the payload with the user data
-        }
+        const response = await axios.get(
+          `${local}/u/check-user-exists?email=${email}`
+        );
+        setUserExists(response.data.exists);
       } catch (error) {
-        // Handle error
-        console.log(error);
+        console.error(`Error: ${error}`);
       }
     };
 
-    fetchUserData();
-  }, [dispatch, value]);
+    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault(); // Prevent the default form submission behavior.
+    return () => clearInterval(intervalId); // Clean up on component unmount
+  }, [email]);
 
+  useEffect(() => {
+    if (userExists) {
+      // Navigate to the next page
+      //   router.push("/");
+    }
+  }, [userExists, router]);
+
+  const onResend = async () => {
     try {
-      if (loginType === "email") {
-        await dispatch(loginUser({ email: value, password }));
-      } else {
-        await dispatch(loginUser({ username: value, password }));
-      }
-      if (user !== null) {
-        if (user.registrationStep === "phoneNumberVerified") {
-          // Redirect the user to the platform/apps page
-          router.push("/platform/apps");
-        } else if (user.registrationStep === "emailVerified") {
-          // Redirect the user to the verify info page
-          router.push("/onboarding/details");
-        } else if (user.registrationStep === "personalInfoVerified") {
-          // Redirect the user to the verify phone number page
-          router.push({
-            pathname: "/onboarding/phone-number",
-            query: {
-              firstName: user.firstName,
-              lastName: user.lastName,
-              organizationName: user.organizationName,
-              birthday: user.birthday,
-              userId: user._id,
-            },
-          });
-        }
-      }
+      const response = await axios.post(`${local}/u/resend-confirmation`, {
+        email,
+      });
+      console.log(response.data.message);
+
+      setIsResendActive(false);
+      setTimeout(() => {
+        setIsResendActive(true);
+      }, 15000);
     } catch (error) {
-      console.error(`Error`, error);
-      setIsError(true);
-      //   setError(error.response.data.error);
+      console.log(error);
     }
   };
 
-  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
+  useEffect(() => {
+    const confirmUser = async () => {
+      if (token && email && hashedPassword) {
+        try {
+          const response = await axios.post(`${local}/u/confirm-user`, {
+            confirmationToken: token,
+            email,
+            hashedPassword,
+          });
+          console.log(response.data);
+          // TODO: Handle successful confirmation. Maybe redirect to a success page?
+        } catch (error) {
+          console.error(`Error: ${error}`);
+          // TODO: Handle error. Maybe show an error message to the user?
+        }
+      }
+    };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
+    confirmUser();
+  }, [token, email, hashedPassword]);
   return (
     <PageContainer>
       <Wrapper>
         <Image
           alt="transparent Logo"
           src={transparentLogo}
-          style={{ objectFit: "contain" }}
-          width={100}
-          height={100}
+          style={{ objectFit: "contain", width: "100px", height: "100px" }}
         />
         <Section>
           <Content>
             <Header>
-              <CreateText>Enter your password</CreateText>
+              <CreateText>Verify your email</CreateText>
+              <Subtitle>
+                An email has been sent to {email}. Click the link within the
+                email to begin the process.
+              </Subtitle>
             </Header>
-            <EmailDiv>
-              <SignupForm onSubmit={handleSubmit}>
-                <InputBox>
-                  <EmailInput
-                    type={loginType}
-                    required="required"
-                    value={value}
-                    disabled={true}
-                  />
-                </InputBox>
-                <EditBox>
-                  <EditWrapper>
-                    <EditLabel href={"/login"}>Edit</EditLabel>
-                  </EditWrapper>
-                </EditBox>
-                {isError === true && error === "User already exists" ? (
-                  <ErrorWrapper>
-                    <ErrorIcon
-                      style={{
-                        color: Colors.error,
-                        width: "18px",
-                        height: "18px",
-                      }}
-                    />
-                    <ErrorText>{error}</ErrorText>
-                  </ErrorWrapper>
-                ) : null}
-
-                <PassBox>
-                  <EmailInput
-                    type={showPassword ? "text" : "password"}
-                    minLength={8}
-                    required="required"
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
-
-                  <EmailLabel>Password</EmailLabel>
-                  {showPassword === true ? (
-                    <EyeWrapper onClick={togglePasswordVisibility}>
-                      <VisibilityOffIcon style={{ color: Colors.grayline }} />
-                    </EyeWrapper>
-                  ) : (
-                    <EyeWrapper onClick={togglePasswordVisibility}>
-                      <VisibilityIcon style={{ color: Colors.grayline }} />
-                    </EyeWrapper>
-                  )}
-                </PassBox>
-                <SignupBtn type="submit">Continue</SignupBtn>
-              </SignupForm>
-              <LoginWrapper>
-                <Subtitle>Already have an account?</Subtitle>
-                <XtraSubtitle href="/login">Log in</XtraSubtitle>
+            {isResendActive ? (
+              <LoginWrapper onClick={onResend}>
+                <SubtitleY>Resend email</SubtitleY>
               </LoginWrapper>
-            </EmailDiv>
+            ) : (
+              <BlockWrapper>
+                <SubtitleZ>Email sent.</SubtitleZ>
+              </BlockWrapper>
+            )}
           </Content>
         </Section>
       </Wrapper>
@@ -463,4 +437,4 @@ const IdentifierPage = (props: Props) => {
   );
 };
 
-export default IdentifierPage;
+export default OnboardingPage;

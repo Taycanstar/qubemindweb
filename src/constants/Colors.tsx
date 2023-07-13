@@ -11,4 +11,5 @@ export default {
   hoverGray: "#dcdcdc",
   error: "rgba(195,0,20,1)",
   lightGrayBg: "rgba(245,245,246, 1)",
+  lightBlack: "#202123",
 };

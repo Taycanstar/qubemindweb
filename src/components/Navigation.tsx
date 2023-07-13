@@ -65,12 +65,12 @@ let company: Item = {
 
 let login: Item = {
   text: "Log in",
-  url: "/login",
+  url: "/auth/login",
 };
 
 let signup: Item = {
   text: "Sign up",
-  url: "/signup",
+  url: "/auth/signup",
 };
 
 const values: Item[] = [devs, product, company, login, signup];

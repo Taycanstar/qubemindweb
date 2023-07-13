@@ -527,13 +527,13 @@ const HeaderDesktop = ({
       </StyledNav>
       <StyledNav>
         <LoginWrapper>
-          <NavLink href={"/login"}>Log in</NavLink>
+          <NavLink href={"/auth/login"}>Log in</NavLink>
           <ArrowIconWrapper>
             <ArrowOutwardIcon style={{ color: "#fff", fontSize: 18 }} />
           </ArrowIconWrapper>
         </LoginWrapper>
         <SignupWrapper>
-          <NavLink href={"/signup"}>Sign up</NavLink>
+          <NavLink href={"/auth/signup"}>Sign up</NavLink>
           <ArrowIconWrapper>
             <ArrowOutwardIcon style={{ color: "#fff", fontSize: 18 }} />
           </ArrowIconWrapper>

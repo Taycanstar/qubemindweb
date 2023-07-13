@@ -2,15 +2,12 @@
 // confirmEmail.tsx
 import axios from "axios";
 import { useRouter } from "next/router";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import Spinner from "@components/Spinner";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
-// import PhoneInput from "react-phone-number-input";
-import PhoneInput from "react-phone-input-2";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
 
 const Wrapper = styled.div`
   display: flex;
@@ -89,7 +86,6 @@ const InputBox = styled.div`
   width: 100%;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
 `;
 
 const BdBox = styled.div`
@@ -153,7 +149,6 @@ const OrgInput = styled.input`
   color: black;
   font-size: 16px;
   font-weight: light;
-  text-align: center;
 
   // &:valid,
   &:focus {
@@ -270,13 +265,13 @@ const BlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  //   padding: 39px;
+  padding: 5px;
   border-radius: 4px;
 `;
 
 const SubtitleZ = styled.p`
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -409,66 +404,119 @@ const LinkTerm = styled(Link)`
   color: ${Colors.amethyst};
 `;
 
-const EnterCode = () => {
+const ConfirmEmail = () => {
   const router = useRouter();
-  const { userId, phoneNumber } = router.query;
+  const { token, email, hashedPassword } = router.query;
+  const [org, setOrg] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [bd, setBd] = useState<string>("");
   const local = process.env.REACT_APP_LOCAL_URL;
-  const [value, setValue] = useState<string | undefined>();
-  const [isResendActive, setIsResendActive] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const handleSubmit = useCallback(async () => {
-    try {
-      const response = await axios.post(
-        `${local}/u/confirm-phone-number/${userId}`,
-        {
-          otpCode: value,
-          phoneNumber: `+${phoneNumber}`,
-        }
-      );
-      // console.log(response.data.message);
-      if (response.status === 200) {
-        // move to the next step in your flow
-        console.log("success, phone number verified");
-        setIsLoading(true);
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1000);
-        router.push({
-          pathname: "/platform/apps",
-        });
-      } else {
-        console.log("Code verification failed.");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [local, userId, value, router.query.phoneNumber]);
+  const [isBdFocused, setIsBdFocused] = useState<boolean>(false);
+  const [isOrgFocused, setIsOrgFocused] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (value && value.length === 6) {
-      handleSubmit();
+    const confirmUser = async () => {
+      if (token && email && hashedPassword) {
+        try {
+          const response = await axios.post(`${local}/u/confirm-user`, {
+            confirmationToken: token,
+            email,
+            hashedPassword,
+          });
+          console.log(response.data);
+          // TODO: Handle successful confirmation. Maybe redirect to a success page?
+
+          const userId = response.data.user._id;
+          setUserId(userId);
+        } catch (error) {
+          console.error(`Error: ${error}`);
+          // TODO: Handle error. Maybe show an error message to the user?
+        }
+      }
+    };
+
+    if (token && email && hashedPassword) {
+      confirmUser();
     }
-  }, [value, handleSubmit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, email, hashedPassword]);
 
-  const onResend = async (event: FormEvent) => {
+  const handleOrgChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setOrg(event.target.value);
+  };
+
+  const handleFirstNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setFirstName(event.target.value);
+  };
+
+  const handleLastNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setLastName(event.target.value);
+  };
+
+  useEffect(() => {
+    const checkUserExists = async () => {
+      try {
+        const response = await axios.get(
+          `${local}/u/check-user-exists?email=${email}`
+        );
+        setUserId(response.data.user._id);
+      } catch (error) {
+        console.error(`Error: ${error}`);
+      }
+    };
+
+    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(intervalId); // Clean up on component unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email]);
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault(); // Prevent the default form submission behavior.
+
     try {
-      event.preventDefault();
-      const response = await axios.post(`${local}/u/resend-code`, {
-        phoneNumber: `+${phoneNumber}`,
-      });
+      const response = await axios.put(
+        `${local}/u/add-personal-info/${userId}`,
+        {
+          firstName,
+          lastName,
+          organizationName: org,
+          birthday: bd,
+        }
+      );
 
-      setIsResendActive(false);
-      setTimeout(() => {
-        setIsResendActive(true);
-      }, 15000);
+      console.log(response, "<= success");
+      // Navigate to the new page with email as a query parameter
+      router.push({
+        pathname: "/auth/onboarding/phone-number",
+        query: {
+          firstName,
+          lastName,
+          organizationName: org,
+          birthday: bd,
+          userId,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setValue(event.target.value);
+  const handleBdFocus = () => {
+    setIsBdFocused(true);
+  };
+
+  const handleBdBlur = () => {
+    setIsBdFocused(false);
+  };
+
+  const handleOrgFocus = () => {
+    setIsOrgFocused(true);
+  };
+
+  const handleOrgBlur = () => {
+    setIsOrgFocused(false);
   };
 
   return (
@@ -482,41 +530,73 @@ const EnterCode = () => {
           height={100}
         />
         <Section>
-          {isLoading ? (
-            <Spinner />
-          ) : (
-            <Content>
-              <Header>
-                <CreateText>Enter code</CreateText>
-                <SubtitleZ>
-                  Input the code that was recently sent to you.
-                </SubtitleZ>
-              </Header>
-
+          <Content>
+            <Header>
+              <CreateText>Tell us about yourself</CreateText>
+            </Header>
+            <SignupForm onSubmit={handleSubmit}>
+              <InputBox>
+                <NameWrapper>
+                  <NameInput
+                    type="text"
+                    value={firstName}
+                    onChange={handleFirstNameChange}
+                    placeholder="First name"
+                  />
+                  <NameInput
+                    type="text"
+                    value={lastName}
+                    onChange={handleLastNameChange}
+                    placeholder="Last name"
+                  />
+                </NameWrapper>
+              </InputBox>
               <InputBox>
                 <OrgInput
                   type="text"
-                  value={value}
-                  onChange={handleCodeChange}
-                  placeholder="000 000"
-                  maxLength={6}
+                  value={org}
+                  onChange={handleOrgChange}
+                  placeholder="Organization name (optional)"
                 />
               </InputBox>
-              {isResendActive ? (
-                <LoginWrapper onClick={onResend}>
-                  <SubtitleY>Resend code</SubtitleY>
-                </LoginWrapper>
-              ) : (
-                <BlockWrapper>
-                  <SubtitleZ>Code sent.</SubtitleZ>
-                </BlockWrapper>
-              )}
-            </Content>
-          )}
+              <BdBox>
+                <BirthdayInput
+                  type="text"
+                  value={bd}
+                  onChange={(event) => {
+                    const input = event.target.value.replace(/\D/g, ""); // Remove non-digit characters
+                    let formattedDate = "";
+
+                    if (input.length > 0) {
+                      formattedDate += input.substr(0, 2);
+                    }
+                    if (input.length > 2) {
+                      formattedDate += "/" + input.substr(2, 2);
+                    }
+                    if (input.length > 4) {
+                      formattedDate += "/" + input.substr(4, 4);
+                    }
+
+                    setBd(formattedDate);
+                  }}
+                  placeholder={isBdFocused ? "MM/DD/YYYY" : "Birthday"}
+                  onFocus={handleBdFocus}
+                  onBlur={handleBdBlur}
+                />
+              </BdBox>
+
+              <SignupBtn type="submit">Continue</SignupBtn>
+            </SignupForm>
+            <Subtitle>
+              By proceeding with "Continue" you consent to our{" "}
+              <LinkTerm href="/terms">Terms of Service</LinkTerm> and recognize
+              our <LinkTerm href="privacy-policy">Privacy Policy.</LinkTerm>
+            </Subtitle>
+          </Content>
         </Section>
       </Wrapper>
     </PageContainer>
   );
 };
 
-export default EnterCode;
+export default ConfirmEmail;

@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
+/* eslint-disable react/no-unescaped-entities */
+// confirmEmail.tsx
+import axios from "axios";
+import { useRouter } from "next/router";
+import React, { useEffect, useState, useCallback } from "react";
+import styled from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import axios from "axios";
-
-type Props = {};
+import Spinner from "@components/Spinner";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
+// import PhoneInput from "react-phone-number-input";
+import PhoneInput from "react-phone-input-2";
 
 const Wrapper = styled.div`
   display: flex;
@@ -56,7 +57,7 @@ const SubtitleY = styled.p`
 
 const Subtitle = styled.p`
   text-align: center;
-  font-size: 16px;
+  font-size: 12px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -64,7 +65,8 @@ const Subtitle = styled.p`
   margin-inline-end: 0px;
   line-height: 1.5;
   font-weight: 400;
-  margin: 0;
+  // margin: 0;
+  margin-bottom: 10px;
 `;
 
 const Header = styled.div`
@@ -87,18 +89,18 @@ const InputBox = styled.div`
   width: 100%;
   align-items: center;
   justify-content: center;
+  margin-bottom: 24px;
 `;
 
-const PassBox = styled.div`
+const BdBox = styled.div`
   position: relative;
   width: 100%;
   align-items: center;
   justify-content: center;
   margin-top: 12px;
-  display: flex;
 `;
 
-const EmailInput = styled.input`
+const BirthdayInput = styled.input`
   height: 52px;
   box-sizing: border-box;
   width: 100%;
@@ -111,15 +113,15 @@ const EmailInput = styled.input`
   font-size: 16px;
   font-weight: light;
 
-  &:valid,
+  // &:valid,
   &:focus {
     color: black;
     font-weight: light;
-    border: 1px solid ${Colors.amethyst};
+    border: 2px solid ${Colors.amethyst};
   }
 `;
 
-const EmailLabel = styled.span`
+const BirthdayLabel = styled.span`
   position: absolute;
   left: 0;
   padding: 15px;
@@ -129,8 +131,50 @@ const EmailLabel = styled.span`
   transition: 0.5s;
   pointer-events: none;
 
-  ${EmailInput}:valid + &,
-  ${EmailInput}:focus + & {
+  ${BirthdayInput}:valid + &,
+  ${BirthdayInput}:focus + & {
+    color: ${Colors.amethyst};
+    transform: translateX(10px) translateY(-25px);
+    font-size: 14px;
+    padding: 0 10px;
+    background: white;
+  }
+`;
+
+const OrgInput = styled.input`
+  height: 52px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  border: 1px solid ${Colors.grayline};
+  background: white;
+  border-radius: 3px;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  font-weight: light;
+  text-align: center;
+
+  // &:valid,
+  &:focus {
+    color: black;
+    font-weight: light;
+    border: 2px solid ${Colors.amethyst};
+  }
+`;
+
+const OrgLabel = styled.span`
+  position: absolute;
+  left: 0;
+  padding: 15px;
+
+  font-size: 16px;
+  color: ${Colors.grayline};
+  transition: 0.5s;
+  pointer-events: none;
+
+  ${OrgInput}:valid + &,
+  ${OrgInput}:focus + & {
     color: ${Colors.amethyst};
     transform: translateX(10px) translateY(-25px);
     font-size: 14px;
@@ -226,13 +270,13 @@ const BlockWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 5px;
+  //   padding: 39px;
   border-radius: 4px;
 `;
 
 const SubtitleZ = styled.p`
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   vertical-align: baseline;
   margin-block-start: 1em;
   margin-block-end: 1em;
@@ -324,45 +368,97 @@ const EditBox = styled.div`
   display: flex;
 `;
 
-const local = process.env.REACT_APP_LOCAL_URL;
+const NameWrapper = styled.div`
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+`;
 
-const OnboardingPage = (props: Props) => {
+const NameInput = styled.input`
+  height: 52px;
+  box-sizing: border-box;
+  width: 50%;
+  padding: 15px;
+  border: 1px solid ${Colors.grayline};
+  background: white;
+  border-radius: 3px;
+  outline: none;
+  color: black;
+  font-size: 16px;
+  font-weight: light;
+
+  // &:valid,
+  &:focus {
+    color: black;
+    font-weight: light;
+    border: 2px solid ${Colors.amethyst};
+  }
+`;
+
+const LinkTerm = styled(Link)`
+  text-align: center;
+  font-size: 12px;
+  vertical-align: baseline;
+  margin-block-start: 1em;
+  margin-block-end: 1em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+  color: ${Colors.amethyst};
+`;
+
+const EnterCode = () => {
   const router = useRouter();
-  const { token, email, hashedPassword } = router.query;
-  const [userExists, setUserExists] = useState<boolean>(false);
+  const { userId, phoneNumber } = router.query;
+  const local = process.env.REACT_APP_LOCAL_URL;
+  const [value, setValue] = useState<string>();
   const [isResendActive, setIsResendActive] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  console.log(userId, "id");
 
-  useEffect(() => {
-    const checkUserExists = async () => {
-      try {
-        const response = await axios.get(
-          `${local}/u/check-user-exists?email=${email}`
-        );
-        setUserExists(response.data.exists);
-      } catch (error) {
-        console.error(`Error: ${error}`);
-      }
-    };
-
-    const intervalId = setInterval(checkUserExists, 5000); // Poll every 5 seconds
-
-    return () => clearInterval(intervalId); // Clean up on component unmount
-  }, [email]);
-
-  useEffect(() => {
-    if (userExists) {
-      // Navigate to the next page
-      //   router.push("/");
-    }
-  }, [userExists, router]);
-
-  const onResend = async () => {
+  const handleSubmit = useCallback(async () => {
+    console.log(userId, "my id");
     try {
-      const response = await axios.post(`${local}/u/resend-confirmation`, {
-        email,
+      const response = await axios.post(
+        `${local}/u/confirm-phone-number/${userId}`,
+        {
+          otpCode: value,
+          phoneNumber: `+${phoneNumber}`,
+        }
+      );
+      // console.log(response.data.message);
+      if (response.status === 200) {
+        // move to the next step in your flow
+        console.log("success, phone number verified");
+        setIsLoading(true);
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1000);
+        router.push({
+          pathname: "/platform/apps",
+        });
+      } else {
+        console.log("Code verification failed.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [local, userId, value, phoneNumber, router]);
+
+  useEffect(() => {
+    if (value && value.length === 6) {
+      handleSubmit();
+    }
+  }, [value, handleSubmit]);
+
+  const onResend = async (event: FormEvent) => {
+    try {
+      event.preventDefault();
+      const response = await axios.post(`${local}/u/resend-code`, {
+        phoneNumber: `+${phoneNumber}`,
       });
-      console.log(response.data.message);
 
       setIsResendActive(false);
       setTimeout(() => {
@@ -373,68 +469,56 @@ const OnboardingPage = (props: Props) => {
     }
   };
 
-  useEffect(() => {
-    const confirmUser = async () => {
-      if (token && email && hashedPassword) {
-        try {
-          const response = await axios.post(`${local}/u/confirm-user`, {
-            confirmationToken: token,
-            email,
-            hashedPassword,
-          });
-          console.log(response.data);
-          // TODO: Handle successful confirmation. Maybe redirect to a success page?
-        } catch (error) {
-          console.error(`Error: ${error}`);
-          // TODO: Handle error. Maybe show an error message to the user?
-        }
-      }
-    };
+  const handleCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue(event.target.value);
+  };
 
-    confirmUser();
-  }, [token, email, hashedPassword]);
   return (
     <PageContainer>
       <Wrapper>
         <Image
           alt="transparent Logo"
           src={transparentLogo}
-          style={{ objectFit: "contain", width: "100px", height: "100px" }}
+          style={{ objectFit: "contain" }}
+          width={100}
+          height={100}
         />
         <Section>
-          <Content>
-            <Header>
-              <CreateText>Verify your email</CreateText>
-              <Subtitle>
-                An email has been sent to {email}. Click the link within the
-                email to begin the process.
-              </Subtitle>
-            </Header>
-            {isResendActive ? (
-              <LoginWrapper onClick={onResend}>
-                <SubtitleY>Resend email</SubtitleY>
-              </LoginWrapper>
-            ) : (
-              <BlockWrapper>
-                <SubtitleZ>Email sent.</SubtitleZ>
-              </BlockWrapper>
-            )}
-          </Content>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <Content>
+              <Header>
+                <CreateText>Enter code</CreateText>
+                <SubtitleZ>
+                  Input the code that was recently sent to you.
+                </SubtitleZ>
+              </Header>
+
+              <InputBox>
+                <OrgInput
+                  type="text"
+                  value={value}
+                  onChange={handleCodeChange}
+                  placeholder="000 000"
+                  maxLength={6}
+                />
+              </InputBox>
+              {isResendActive ? (
+                <LoginWrapper onClick={onResend}>
+                  <SubtitleY>Resend code</SubtitleY>
+                </LoginWrapper>
+              ) : (
+                <BlockWrapper>
+                  <SubtitleZ>Code sent.</SubtitleZ>
+                </BlockWrapper>
+              )}
+            </Content>
+          )}
         </Section>
       </Wrapper>
-      <Footer>
-        <FooterWrapper>
-          <StyledFooterDiv>
-            <FooterText href="/terms">Terms of use</FooterText>
-          </StyledFooterDiv>
-          <Separator></Separator>
-          <StyledFooterDiv>
-            <FooterText href="/privacy-policy">Privacy policy</FooterText>
-          </StyledFooterDiv>
-        </FooterWrapper>
-      </Footer>
     </PageContainer>
   );
 };
 
-export default OnboardingPage;
+export default EnterCode;

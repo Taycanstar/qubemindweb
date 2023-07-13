@@ -1,15 +1,16 @@
-/* eslint-disable react/no-unescaped-entities */
-// confirmEmail.tsx
-import axios from "axios";
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
-// import PhoneInput from "react-phone-number-input";
-import PhoneInput from "react-phone-input-2";
+import { useRouter } from "next/router";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import axios from "axios";
+import ErrorIcon from "@mui/icons-material/Error";
+
+type Props = {};
 
 const Wrapper = styled.div`
   display: flex;
@@ -40,7 +41,7 @@ const CreateText = styled.h1`
   margin: 15px 0;
 `;
 
-const SubtitleY = styled.p`
+const Subtitle = styled.p`
   text-align: center;
   font-size: 14px;
   vertical-align: baseline;
@@ -51,21 +52,6 @@ const SubtitleY = styled.p`
   line-height: 1.5;
   font-weight: 400;
   margin: 0;
-  color: ${Colors.amethyst};
-`;
-
-const Subtitle = styled.p`
-  text-align: center;
-  font-size: 12px;
-  vertical-align: baseline;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  line-height: 1.5;
-  font-weight: 400;
-  // margin: 0;
-  margin-bottom: 10px;
 `;
 
 const Header = styled.div`
@@ -90,15 +76,16 @@ const InputBox = styled.div`
   justify-content: center;
 `;
 
-const BdBox = styled.div`
+const PassBox = styled.div`
   position: relative;
   width: 100%;
   align-items: center;
   justify-content: center;
   margin-top: 12px;
+  display: flex;
 `;
 
-const BirthdayInput = styled.input`
+const EmailInput = styled.input`
   height: 52px;
   box-sizing: border-box;
   width: 100%;
@@ -111,7 +98,7 @@ const BirthdayInput = styled.input`
   font-size: 16px;
   font-weight: light;
 
-  // &:valid,
+  &:valid,
   &:focus {
     color: black;
     font-weight: light;
@@ -119,7 +106,7 @@ const BirthdayInput = styled.input`
   }
 `;
 
-const BirthdayLabel = styled.span`
+const EmailLabel = styled.span`
   position: absolute;
   left: 0;
   padding: 15px;
@@ -129,49 +116,8 @@ const BirthdayLabel = styled.span`
   transition: 0.5s;
   pointer-events: none;
 
-  ${BirthdayInput}:valid + &,
-  ${BirthdayInput}:focus + & {
-    color: ${Colors.amethyst};
-    transform: translateX(10px) translateY(-25px);
-    font-size: 14px;
-    padding: 0 10px;
-    background: white;
-  }
-`;
-
-const OrgInput = styled.input`
-  height: 52px;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 15px;
-  border: 1px solid ${Colors.grayline};
-  background: white;
-  border-radius: 3px;
-  outline: none;
-  color: black;
-  font-size: 16px;
-  font-weight: light;
-
-  // &:valid,
-  &:focus {
-    color: black;
-    font-weight: light;
-    border: 2px solid ${Colors.amethyst};
-  }
-`;
-
-const OrgLabel = styled.span`
-  position: absolute;
-  left: 0;
-  padding: 15px;
-
-  font-size: 16px;
-  color: ${Colors.grayline};
-  transition: 0.5s;
-  pointer-events: none;
-
-  ${OrgInput}:valid + &,
-  ${OrgInput}:focus + & {
+  ${EmailInput}:valid + &,
+  ${EmailInput}:focus + & {
     color: ${Colors.amethyst};
     transform: translateX(10px) translateY(-25px);
     font-size: 14px;
@@ -253,36 +199,6 @@ const LoginWrapper = styled.div`
   justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 5px;
-  border-radius: 4px;
-
-  &:hover {
-    background-color: rgba(138, 77, 211, 0.2);
-    cursor: pointer;
-  }
-`;
-
-const BlockWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  padding: 39px;
-  border-radius: 4px;
-`;
-
-const SubtitleZ = styled.p`
-  text-align: center;
-  font-size: 16px;
-  vertical-align: baseline;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  line-height: 1.5;
-  font-weight: 500;
-  margin: 0;
-  color: ${Colors.amethyst};
 `;
 
 const Underline = styled.div`
@@ -365,72 +281,64 @@ const EditBox = styled.div`
   display: flex;
 `;
 
-const NameWrapper = styled.div`
+const ErrorWrapper = styled.div`
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
-`;
-
-const NameInput = styled.input`
-  height: 52px;
-  box-sizing: border-box;
-  width: 50%;
-  padding: 15px;
-  border: 1px solid ${Colors.grayline};
-  background: white;
-  border-radius: 3px;
-  outline: none;
-  color: black;
-  font-size: 16px;
-  font-weight: light;
-
-  // &:valid,
-  &:focus {
-    color: black;
-    font-weight: light;
-    border: 2px solid ${Colors.amethyst};
-  }
-`;
-
-const LinkTerm = styled(Link)`
-  text-align: center;
-  font-size: 12px;
-  vertical-align: baseline;
-  margin-block-start: 1em;
-  margin-block-end: 1em;
-  margin-inline-start: 0px;
-  margin-inline-end: 0px;
-  line-height: 1.5;
-  font-weight: 400;
+  align-items: center;
   margin: 0;
-  color: ${Colors.amethyst};
+  padding: 5px 0 10px 0;
 `;
 
-const VerifyNumber = () => {
+const ErrorText = styled.p`
+  font-size: 12px;
+  color: ${Colors.error};
+  margin: 0;
+  padding: 0;
+`;
+
+const local = process.env.REACT_APP_LOCAL_URL;
+
+const SetPasswordPage = (props: Props) => {
   const router = useRouter();
-  const { userId } = router.query;
-  const LOCAL = process.env.REACT_APP_LOCAL_URL;
-  const [value, setValue] = useState<string | undefined>();
-  const [isResendActive, setIsResendActive] = useState<boolean>(true);
+  const email = router.query.email;
+  const [password, setPassword] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
 
   const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    try {
-      const response = await axios.post(`${LOCAL}/u/send-code`, {
-        phoneNumber: `+${value}`,
-      });
+    event.preventDefault(); // Prevent the default form submission behavior.
 
+    console.log(`Form submitted with email: ${email}`);
+
+    //axios call
+    try {
+      const response = await axios.post(`${local}/u/register`, {
+        email: email.toLowerCase(),
+        password,
+      });
+      console.log(response.data.message, "msg");
+
+      // Navigate to the email verification page
       router.push({
-        pathname: "/onboarding/verify",
-        query: {
-          phoneNumber: value,
-          userId,
-        },
+        pathname: "/auth/onboarding",
+        query: { email },
       });
     } catch (error) {
-      console.log(error);
+      console.error(`Error => ${error.response.data.error}`);
+      setIsError(true);
+      setError(error.response.data.error);
     }
   };
+
+  const handlePasswordChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setPassword(event.target.value);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <PageContainer>
       <Wrapper>
@@ -444,31 +352,84 @@ const VerifyNumber = () => {
         <Section>
           <Content>
             <Header>
-              <CreateText>Verify your phone number</CreateText>
+              <CreateText>Create your account</CreateText>
+              <Subtitle>
+                Please be aware that we may need to verify your identity via
+                phone during the signup process. Rest assured, your phone number
+                will solely be used for this security measure.
+              </Subtitle>
             </Header>
-            <SignupForm onSubmit={handleSubmit}>
-              <PhoneInput
-                country={"us"}
-                placeholder="Enter phone number"
-                value={value}
-                onChange={setValue}
-                inputStyle={{
-                  height: "52px",
-                  width: "100%",
-                }}
-                containerStyle={{
-                  height: "52px",
-                  width: "100%",
-                }}
-              />
+            <EmailDiv>
+              <SignupForm onSubmit={handleSubmit}>
+                <InputBox>
+                  <EmailInput
+                    type="email"
+                    required="required"
+                    value={email}
+                    disabled={true}
+                  />
+                </InputBox>
+                <EditBox>
+                  <EditWrapper>
+                    <EditLabel href={"/login"}>Edit</EditLabel>
+                  </EditWrapper>
+                </EditBox>
+                {isError === true && error === "User already exists" ? (
+                  <ErrorWrapper>
+                    <ErrorIcon
+                      style={{
+                        color: Colors.error,
+                        width: "18px",
+                        height: "18px",
+                      }}
+                    />
+                    <ErrorText>{error}</ErrorText>
+                  </ErrorWrapper>
+                ) : null}
 
-              <SignupBtn type="submit">Send code</SignupBtn>
-            </SignupForm>
+                <PassBox>
+                  <EmailInput
+                    type={showPassword ? "text" : "password"}
+                    minLength={8}
+                    required="required"
+                    value={password}
+                    onChange={handlePasswordChange}
+                  />
+
+                  <EmailLabel>Password</EmailLabel>
+                  {showPassword === true ? (
+                    <EyeWrapper onClick={togglePasswordVisibility}>
+                      <VisibilityOffIcon style={{ color: Colors.grayline }} />
+                    </EyeWrapper>
+                  ) : (
+                    <EyeWrapper onClick={togglePasswordVisibility}>
+                      <VisibilityIcon style={{ color: Colors.grayline }} />
+                    </EyeWrapper>
+                  )}
+                </PassBox>
+                <SignupBtn type="submit">Continue</SignupBtn>
+              </SignupForm>
+              <LoginWrapper>
+                <Subtitle>Already have an account?</Subtitle>
+                <XtraSubtitle href="/login">Log in</XtraSubtitle>
+              </LoginWrapper>
+            </EmailDiv>
           </Content>
         </Section>
       </Wrapper>
+      <Footer>
+        <FooterWrapper>
+          <StyledFooterDiv>
+            <FooterText href="/terms">Terms of use</FooterText>
+          </StyledFooterDiv>
+          <Separator></Separator>
+          <StyledFooterDiv>
+            <FooterText href="/privacy-policy">Privacy policy</FooterText>
+          </StyledFooterDiv>
+        </FooterWrapper>
+      </Footer>
     </PageContainer>
   );
 };
 
-export default VerifyNumber;
+export default SetPasswordPage;

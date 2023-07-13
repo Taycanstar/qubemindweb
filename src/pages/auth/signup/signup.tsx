@@ -6,7 +6,7 @@ import {
   googleLogo,
   appleLogo,
   microsoftLogo,
-} from "../app/utils/images/ImageAssets";
+} from "../../../app/utils/images/ImageAssets";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -283,8 +283,8 @@ const SignupPage = (props: Props) => {
 
     // Navigate to the new page with email as a query parameter
     router.push({
-      pathname: "/onboarding/password",
-      query: { email },
+      pathname: "auth/onboarding/password",
+      query: { email: email.toLowerCase() },
     });
   };
 
@@ -324,7 +324,7 @@ const SignupPage = (props: Props) => {
             </SignupForm>
             <LoginWrapper>
               <Subtitle>Already have an account?</Subtitle>
-              <XtraSubtitle href="/login">Log in</XtraSubtitle>
+              <XtraSubtitle href="/auth/login">Log in</XtraSubtitle>
             </LoginWrapper>
           </EmailDiv>
           <InputBox>

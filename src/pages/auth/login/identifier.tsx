@@ -1,14 +1,17 @@
+/* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import Image from "next/image";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { transparentLogo } from "../../app/utils/images/ImageAssets";
+import { transparentLogo } from "../../../app/utils/images/ImageAssets";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import axios from "axios";
 import ErrorIcon from "@mui/icons-material/Error";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, fetchUserByValue } from "../../../app/store/user/";
 
 type Props = {};
 
@@ -298,36 +301,72 @@ const ErrorText = styled.p`
 
 const local = process.env.REACT_APP_LOCAL_URL;
 
-const SetPasswordPage = (props: Props) => {
+interface User {
+  [key: string]: any;
+}
+
+const IdentifierPage = (props: Props) => {
   const router = useRouter();
-  const email = router.query.email;
+  const { value, loginType } = router.query;
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const dispatch = useDispatch();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await dispatch(fetchUserByValue(value));
+        if (response.payload) {
+          setUser(response.payload); // Access the payload with the user data
+        }
+      } catch (error) {
+        // Handle error
+        console.log(error);
+      }
+    };
+
+    fetchUserData();
+  }, [dispatch, value]);
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault(); // Prevent the default form submission behavior.
 
-    console.log(`Form submitted with email: ${email}`);
-
-    //axios call
     try {
-      const response = await axios.post(`${local}/u/register`, {
-        email,
-        password,
-      });
-      console.log(response.data.message, "msg");
-
-      // Navigate to the email verification page
-      router.push({
-        pathname: "/onboarding",
-        query: { email },
-      });
+      if (loginType === "email") {
+        const modVal = await dispatch(
+          loginUser({ email: value.toLowerCase(), password })
+        );
+      } else {
+        await dispatch(loginUser({ username: value.toLowerCase(), password }));
+      }
+      if (user !== null) {
+        if (user.registrationStep === "phoneNumberVerified") {
+          // Redirect the user to the platform/apps page
+          router.push("/platform/apps");
+        } else if (user.registrationStep === "emailVerified") {
+          // Redirect the user to the verify info page
+          router.push("/auth/onboarding/details");
+        } else if (user.registrationStep === "personalInfoVerified") {
+          // Redirect the user to the verify phone number page
+          router.push({
+            pathname: "/auth/onboarding/phone-number",
+            query: {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              organizationName: user.organizationName,
+              birthday: user.birthday,
+              userId: user._id,
+            },
+          });
+        }
+      }
     } catch (error) {
-      console.error(`Error => ${error.response.data.error}`);
+      console.error(`Error`, error);
       setIsError(true);
-      setError(error.response.data.error);
+      //   setError(error.response.data.error);
     }
   };
 
@@ -352,26 +391,21 @@ const SetPasswordPage = (props: Props) => {
         <Section>
           <Content>
             <Header>
-              <CreateText>Create your account</CreateText>
-              <Subtitle>
-                Please be aware that we may need to verify your identity via
-                phone during the signup process. Rest assured, your phone number
-                will solely be used for this security measure.
-              </Subtitle>
+              <CreateText>Enter your password</CreateText>
             </Header>
             <EmailDiv>
               <SignupForm onSubmit={handleSubmit}>
                 <InputBox>
                   <EmailInput
-                    type="email"
+                    type={loginType}
                     required="required"
-                    value={email}
+                    value={value}
                     disabled={true}
                   />
                 </InputBox>
                 <EditBox>
                   <EditWrapper>
-                    <EditLabel href={"/login"}>Edit</EditLabel>
+                    <EditLabel href={"/auth/login"}>Edit</EditLabel>
                   </EditWrapper>
                 </EditBox>
                 {isError === true && error === "User already exists" ? (
@@ -410,8 +444,8 @@ const SetPasswordPage = (props: Props) => {
                 <SignupBtn type="submit">Continue</SignupBtn>
               </SignupForm>
               <LoginWrapper>
-                <Subtitle>Already have an account?</Subtitle>
-                <XtraSubtitle href="/login">Log in</XtraSubtitle>
+                <Subtitle>Don't have an account?</Subtitle>
+                <XtraSubtitle href="/auth/signup">Signup</XtraSubtitle>
               </LoginWrapper>
             </EmailDiv>
           </Content>
@@ -432,4 +466,4 @@ const SetPasswordPage = (props: Props) => {
   );
 };
 
-export default SetPasswordPage;
+export default IdentifierPage;

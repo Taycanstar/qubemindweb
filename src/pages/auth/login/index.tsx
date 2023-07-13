@@ -7,7 +7,7 @@ import {
   googleLogo,
   appleLogo,
   microsoftLogo,
-} from "../../app/utils/images/ImageAssets";
+} from "../../../app/utils/images/ImageAssets";
 import Colors from "@constants/Colors";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -91,6 +91,7 @@ const EmailInput = styled.input`
   color: black;
   font-size: 16px;
   font-weight: light;
+  // text-transform: lowercase;
 
   &:valid,
   &:focus {
@@ -283,8 +284,8 @@ const LoginPage = (props: Props) => {
 
     // Navigate to the new page with email as a query parameter
     router.push({
-      pathname: "/login/identifier",
-      query: { value: loginValue, loginType },
+      pathname: "/auth/login/identifier",
+      query: { value: loginValue.toLowerCase(), loginType },
     });
   };
 
@@ -331,7 +332,7 @@ const LoginPage = (props: Props) => {
             </SignupForm>
             <LoginWrapper>
               <Subtitle>Don't have an account?</Subtitle>
-              <XtraSubtitle href="/signup">Sign up</XtraSubtitle>
+              <XtraSubtitle href="/auth/signup">Sign up</XtraSubtitle>
             </LoginWrapper>
           </EmailDiv>
           <InputBox>
